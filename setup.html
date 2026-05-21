@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup - 設置 - 設置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px; border: 2px solid #ff6b35; background: white; color: #ff6b35;
+            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s;
+        }
+
+        .lang-btn.active { background: #ff6b35; color: white; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white; padding: 30px; border-radius: 16px; margin-bottom: 30px; margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px; overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px; background: none; border: none; border-bottom: 3px solid transparent;
+            cursor: pointer; font-size: 15px; font-weight: 500; color: #cc6b3e; transition: all 0.3s; white-space: nowrap;
+        }
+
+        .tab.active { color: #ff6b35; border-bottom-color: #ff6b35; }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .form-section {
+            background: white; padding: 24px; border-radius: 12px; border: 1px solid #ffe4d0; margin-bottom: 20px;
+        }
+
+        .form-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+
+        .form-group {
+            margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+        }
+
+        .form-group.full { grid-template-columns: 1fr; }
+
+        label { font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px; display: block; }
+
+        input, select, textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Calibri, sans-serif;
+            font-size: 13px;
+        }
+
+        textarea { min-height: 80px; resize: vertical; }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .btn-submit {
+            background: #ff6b35; color: white; padding: 12px 24px; border: none; border-radius: 6px;
+            cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s;
+        }
+
+        .btn-submit:hover { background: #ff5520; }
+
+        .setup-list {
+            background: white; padding: 20px; border-radius: 12px; border: 1px solid #ffe4d0;
+        }
+
+        .setup-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #ffe4d0;
+        }
+
+        .setup-item:last-child { border-bottom: none; }
+
+        .setup-info h4 { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .setup-info p { font-size: 12px; color: #999; }
+
+        .status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-complete { background: #d4edda; color: #155724; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th { background: #fff5ed; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; color: #cc6b3e; border-bottom: 2px solid #ffe4d0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #ffe4d0; font-size: 14px; }
+        tr:hover { background: #fff9f4; }
+
+        .role-badge {
+            display: inline-block; padding: 4px 12px; background: #fff5ed; color: #ff6b35; border-radius: 12px; font-size: 12px; font-weight: 600;
+        }
+
+        <button onclick="goBack()" style="position: fixed; top: 20px; left: 20px; padding: 8px 16px; border: 2px solid #ff6b35; background: white; color: #ff6b35; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; z-index: 999; transition: all 0.3s;">← Back</button>
+    </style>
+</head>
+<body>
+    <button onclick="goBack()" style="position: fixed; top: 20px; left: 20px; padding: 8px 16px; border: 2px solid #ff6b35; background: white; color: #ff6b35; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; z-index: 999; transition: all 0.3s;">← Back</button>
+
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+        <button class="lang-btn" onclick="setLanguage('zh-tw')">繁體中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="⚙️ System Setup" data-zh="⚙️ 系統設置" data-zh-tw="⚙️ 系統設置">⚙️ System Setup</h1>
+            <p data-en="Configure your restaurant management system" data-zh="配置您的餐廳管理系統" data-zh-tw="配置您的餐廳管理系統">Configure your restaurant management system</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('users')" data-en="User Setup" data-zh="用戶設置" data-zh-tw="用戶設置">User Setup</button>
+            <button class="tab" onclick="switchTab('inventory')" data-en="Inventory Items" data-zh="庫存項目" data-zh-tw="庫存項目">Inventory Items</button>
+            <button class="tab" onclick="switchTab('restaurant')" data-en="Restaurant Info" data-zh="餐廳信息" data-zh-tw="餐廳信息">Restaurant Info</button>
+            <button class="tab" onclick="switchTab('suppliers')" data-en="Suppliers" data-zh="供應商" data-zh-tw="供應商">Suppliers</button>
+            <button class="tab" onclick="switchTab('checklist')" data-en="Setup Checklist" data-zh="設置清單" data-zh-tw="設置清單">Setup Checklist</button>
+        </div>
+
+        <!-- USER SETUP -->
+        <div id="users" class="content active">
+            <div class="form-section">
+                <h3 data-en="👤 Add New User" data-zh="👤 添加新用戶" data-zh-tw="👤 添加新用戶">👤 Add New User</h3>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Full Name" data-zh="全名" data-zh-tw="全名">Full Name</label>
+                        <input type="text" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label data-en="Email" data-zh="電郵" data-zh-tw="電郵">Email</label>
+                        <input type="email" placeholder="john@restaurant.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Role" data-zh="角色" data-zh-tw="角色">Role</label>
+                        <select>
+                            <option data-en="-- Select Role --" data-zh="-- 選擇角色 --" data-zh-tw="-- 選擇角色 --">-- Select Role --</option>
+                            <option data-en="Manager" data-zh="經理" data-zh-tw="經理">Manager</option>
+                            <option data-en="Cashier" data-zh="收銀員" data-zh-tw="收銀員">Cashier</option>
+                            <option data-en="Chef" data-zh="廚師" data-zh-tw="廚師">Chef</option>
+                            <option data-en="Staff" data-zh="員工" data-zh-tw="員工">Staff</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label data-en="Password" data-zh="密碼" data-zh-tw="密碼">Password</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                </div>
+                <button class="btn-submit" data-en="Add User" data-zh="添加用戶" data-zh-tw="添加用戶">Add User</button>
+            </div>
+
+            <div class="form-section">
+                <h3 data-en="👥 Existing Users" data-zh="👥 現有用戶" data-zh-tw="👥 現有用戶">👥 Existing Users</h3>
+                <table>
+                    <tr>
+                        <th data-en="Name" data-zh="名稱" data-zh-tw="名稱">Name</th>
+                        <th data-en="Role" data-zh="角色" data-zh-tw="角色">Role</th>
+                        <th data-en="Email" data-zh="電郵" data-zh-tw="電郵">Email</th>
+                        <th data-en="Status" data-zh="狀態" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td>Jackie Chan</td>
+                        <td><span class="role-badge" data-en="Manager" data-zh="經理" data-zh-tw="經理">Manager</span></td>
+                        <td>jackie@restaurant.com</td>
+                        <td><span class="status-badge status-complete" data-en="Active" data-zh="活躍" data-zh-tw="活躍">Active</span></td>
+                    </tr>
+                    <tr>
+                        <td>Mary Wong</td>
+                        <td><span class="role-badge" data-en="Cashier" data-zh="收銀員" data-zh-tw="收銀員">Cashier</span></td>
+                        <td>mary@restaurant.com</td>
+                        <td><span class="status-badge status-complete" data-en="Active" data-zh="活躍" data-zh-tw="活躍">Active</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- INVENTORY ITEMS SETUP -->
+        <div id="inventory" class="content">
+            <div class="form-section">
+                <h3 data-en="📦 Add Inventory Item" data-zh="📦 添加庫存項目" data-zh-tw="📦 添加庫存項目">📦 Add Inventory Item</h3>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Item Name" data-zh="項目名稱" data-zh-tw="項目名稱">Item Name</label>
+                        <input type="text" placeholder="e.g., Chicken Breast">
+                    </div>
+                    <div>
+                        <label data-en="Category" data-zh="類別" data-zh-tw="類別">Category</label>
+                        <select>
+                            <option data-en="Meat & Poultry" data-zh="肉類禽類" data-zh-tw="肉類禽類">Meat & Poultry</option>
+                            <option data-en="Vegetables" data-zh="蔬菜" data-zh-tw="蔬菜">Vegetables</option>
+                            <option data-en="Dairy" data-zh="乳製品" data-zh-tw="乳製品">Dairy</option>
+                            <option data-en="Grains" data-zh="穀物" data-zh-tw="穀物">Grains</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Unit" data-zh="單位" data-zh-tw="單位">Unit</label>
+                        <input type="text" placeholder="kg, piece, etc">
+                    </div>
+                    <div>
+                        <label data-en="Unit Cost" data-zh="單位成本" data-zh-tw="單位成本">Unit Cost</label>
+                        <input type="number" placeholder="0.00" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label data-en="Reorder Point" data-zh="重新訂購點" data-zh-tw="重新訂購點">Reorder Point</label>
+                        <input type="number" placeholder="Minimum quantity to trigger reorder">
+                    </div>
+                </div>
+                <button class="btn-submit" data-en="Add Item" data-zh="添加項目" data-zh-tw="添加項目">Add Item</button>
+            </div>
+
+            <div class="form-section">
+                <h3 data-en="📋 Inventory Items List" data-zh="📋 庫存項目清單" data-zh-tw="📋 庫存項目清單">📋 Inventory Items List</h3>
+                <table>
+                    <tr>
+                        <th data-en="Item" data-zh="項目" data-zh-tw="項目">Item</th>
+                        <th data-en="Category" data-zh="類別" data-zh-tw="類別">Category</th>
+                        <th data-en="Unit" data-zh="單位" data-zh-tw="單位">Unit</th>
+                        <th data-en="Cost" data-zh="成本" data-zh-tw="成本">Cost</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Chicken Breast" data-zh="雞胸肉" data-zh-tw="雞胸肉">Chicken Breast</td>
+                        <td data-en="Meat & Poultry" data-zh="肉類禽類" data-zh-tw="肉類禽類">Meat & Poultry</td>
+                        <td>kg</td>
+                        <td>$12.50</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- RESTAURANT INFO -->
+        <div id="restaurant" class="content">
+            <div class="form-section">
+                <h3 data-en="🏪 Restaurant Information" data-zh="🏪 餐廳信息" data-zh-tw="🏪 餐廳信息">🏪 Restaurant Information</h3>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Restaurant Name" data-zh="餐廳名稱" data-zh-tw="餐廳名稱">Restaurant Name</label>
+                        <input type="text" placeholder="Your Restaurant Name">
+                    </div>
+                    <div>
+                        <label data-en="Location" data-zh="位置" data-zh-tw="位置">Location</label>
+                        <input type="text" placeholder="Address">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Phone" data-zh="電話" data-zh-tw="電話">Phone</label>
+                        <input type="tel" placeholder="+1 (555) 000-0000">
+                    </div>
+                    <div>
+                        <label data-en="Email" data-zh="電郵" data-zh-tw="電郵">Email</label>
+                        <input type="email" placeholder="info@restaurant.com">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label data-en="Business Hours" data-zh="營業時間" data-zh-tw="營業時間">Business Hours</label>
+                        <input type="text" placeholder="e.g., 10:00 AM - 10:00 PM">
+                    </div>
+                </div>
+                <button class="btn-submit" data-en="Save" data-zh="保存" data-zh-tw="保存">Save</button>
+            </div>
+        </div>
+
+        <!-- SUPPLIERS -->
+        <div id="suppliers" class="content">
+            <div class="form-section">
+                <h3 data-en="🏢 Add Supplier" data-zh="🏢 添加供應商" data-zh-tw="🏢 添加供應商">🏢 Add Supplier</h3>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Supplier Name" data-zh="供應商名稱" data-zh-tw="供應商名稱">Supplier Name</label>
+                        <input type="text" placeholder="Supplier Name">
+                    </div>
+                    <div>
+                        <label data-en="Contact Person" data-zh="聯繫人" data-zh-tw="聯繫人">Contact Person</label>
+                        <input type="text" placeholder="Contact Name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <label data-en="Phone" data-zh="電話" data-zh-tw="電話">Phone</label>
+                        <input type="tel" placeholder="+1 (555) 000-0000">
+                    </div>
+                    <div>
+                        <label data-en="Email" data-zh="電郵" data-zh-tw="電郵">Email</label>
+                        <input type="email" placeholder="supplier@company.com">
+                    </div>
+                </div>
+                <div class="form-group full">
+                    <div>
+                        <label data-en="Category" data-zh="類別" data-zh-tw="類別">Category</label>
+                        <input type="text" placeholder="e.g., Meat, Vegetables, etc">
+                    </div>
+                </div>
+                <button class="btn-submit" data-en="Add Supplier" data-zh="添加供應商" data-zh-tw="添加供應商">Add Supplier</button>
+            </div>
+        </div>
+
+        <!-- SETUP CHECKLIST -->
+        <div id="checklist" class="content">
+            <div class="setup-list">
+                <h3 style="margin-bottom: 16px;" data-en="✓ Setup Checklist" data-zh="✓ 設置清單" data-zh-tw="✓ 設置清單">✓ Setup Checklist</h3>
+
+                <div class="setup-item">
+                    <div class="setup-info">
+                        <h4 data-en="Restaurant Information" data-zh="餐廳信息" data-zh-tw="餐廳信息">Restaurant Information</h4>
+                        <p data-en="Add your restaurant name, address, and contact details" data-zh="添加您的餐廳名稱、地址和聯繫方式" data-zh-tw="添加您的餐廳名稱、地址和聯繫方式">Add your restaurant name, address, and contact details</p>
+                    </div>
+                    <span class="status-badge status-complete" data-en="Complete" data-zh="完成" data-zh-tw="完成">Complete</span>
+                </div>
+
+                <div class="setup-item">
+                    <div class="setup-info">
+                        <h4 data-en="Create Admin User" data-zh="創建管理員用戶" data-zh-tw="創建管理員用戶">Create Admin User</h4>
+                        <p data-en="Set up the main administrator account" data-zh="設置主管理員帳戶" data-zh-tw="設置主管理員帳戶">Set up the main administrator account</p>
+                    </div>
+                    <span class="status-badge status-complete" data-en="Complete" data-zh="完成" data-zh-tw="完成">Complete</span>
+                </div>
+
+                <div class="setup-item">
+                    <div class="setup-info">
+                        <h4 data-en="Add Inventory Items" data-zh="添加庫存項目" data-zh-tw="添加庫存項目">Add Inventory Items</h4>
+                        <p data-en="Add all your food and supply items to the system" data-zh="將所有食品和供應項目添加到系統中" data-zh-tw="將所有食品和供應項目添加到系統中">Add all your food and supply items to the system</p>
+                    </div>
+                    <span class="status-badge status-pending" data-en="Pending" data-zh="待處理" data-zh-tw="待處理">Pending</span>
+                </div>
+
+                <div class="setup-item">
+                    <div class="setup-info">
+                        <h4 data-en="Set Up Suppliers" data-zh="設置供應商" data-zh-tw="設置供應商">Set Up Suppliers</h4>
+                        <p data-en="Add supplier information and contact details" data-zh="添加供應商信息和聯繫方式" data-zh-tw="添加供應商信息和聯繫方式">Add supplier information and contact details</p>
+                    </div>
+                    <span class="status-badge status-pending" data-en="Pending" data-zh="待處理" data-zh-tw="待處理">Pending</span>
+                </div>
+
+                <div class="setup-item">
+                    <div class="setup-info">
+                        <h4 data-en="Add Team Members" data-zh="添加團隊成員" data-zh-tw="添加團隊成員">Add Team Members</h4>
+                        <p data-en="Create accounts for all staff members with appropriate roles" data-zh="為所有員工創建帳戶並分配適當的角色" data-zh-tw="為所有員工創建帳戶並分配適當的角色">Create accounts for all staff members with appropriate roles</p>
+                    </div>
+                    <span class="status-badge status-pending" data-en="Pending" data-zh="待處理" data-zh-tw="待處理">Pending</span>
+                </div>
+
+                <div class="setup-item">
+                    <div class="setup-info">
+                        <h4 data-en="Configure Settings" data-zh="配置設置" data-zh-tw="配置設置">Configure Settings</h4>
+                        <p data-en="Set up tax rates, business hours, and other preferences" data-zh="設置稅率、營業時間和其他偏好" data-zh-tw="設置稅率、營業時間和其他偏好">Set up tax rates, business hours, and other preferences</p>
+                    </div>
+                    <span class="status-badge status-pending" data-en="Pending" data-zh="待處理" data-zh-tw="待處理">Pending</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                let text = '';
+                if (lang === 'en') {
+                    text = el.getAttribute('data-en');
+                } else if (lang === 'zh') {
+                    text = el.getAttribute('data-zh');
+                } else if (lang === 'zh-tw') {
+                    text = el.getAttribute('data-zh-tw');
+                }
+                if (text) el.textContent = text;
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
