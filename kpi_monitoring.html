@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI Monitoring - 关键绩效指标监控</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #cc6b3e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .kpi-title { font-weight: 600; color: #333; font-size: 14px; }
+        .kpi-icon { font-size: 24px; }
+
+        .kpi-value { font-size: 28px; font-weight: 700; color: #ff6b35; margin-bottom: 8px; font-family: Calibri, monospace; }
+        .kpi-target { font-size: 12px; color: #999; margin-bottom: 12px; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ffe4d0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff6b35;
+        }
+
+        .status-text { font-size: 12px; color: #666; margin-top: 8px; }
+
+        .table-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .table-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fff5ed; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; color: #cc6b3e; border-bottom: 2px solid #ffe4d0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #ffe4d0; font-size: 14px; }
+        tr:hover { background: #fff9f4; }
+
+        .amount-cell { font-weight: 600; color: #ff6b35; font-family: Calibri, monospace; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-on-track { background: #d4edda; color: #155724; }
+        .status-at-risk { background: #fff3cd; color: #856404; }
+        .status-off-track { background: #f8d7da; color: #721c24; }
+
+        @media (max-width: 600px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="📊 KPI Monitoring Dashboard" data-zh="📊 关键绩效指标监控板" data-zh-tw="📊 關鍵績效指標监控板">📊 KPI Monitoring Dashboard</h1>
+            <p data-en="Track key performance indicators and business metrics in real-time" data-zh="实时跟踪关键绩效指标和业务指标" data-zh-tw="实时跟踪關鍵績效指標和业务指標">Track key performance indicators and business metrics in real-time</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')" data-en="Dashboard" data-zh="仪表板" data-zh-tw="仪表板">Dashboard</button>
+            <button class="tab" onclick="switchTab('operations')" data-en="Operations" data-zh="运营" data-zh-tw="运营">Operations</button>
+            <button class="tab" onclick="switchTab('financial')" data-en="Financial" data-zh="财务" data-zh-tw="财务">Financial</button>
+            <button class="tab" onclick="switchTab('customer')" data-en="Customer" data-zh="客户" data-zh-tw="客户">Customer</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="content active">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title" data-en="Daily Revenue" data-zh="日收入" data-zh-tw="日收入">Daily Revenue</div>
+                        <div class="kpi-icon">💰</div>
+                    </div>
+                    <div class="kpi-value">$8,450</div>
+                    <div class="kpi-target" data-en="Target: $8,000" data-zh="目标：$8,000" data-zh-tw="目標：$8,000">Target: $8,000</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 105%;"></div>
+                    </div>
+                    <div class="status-text" data-en="✓ On Track" data-zh="✓ 按计划" data-zh-tw="✓ 按计划">✓ On Track</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title" data-en="Food Cost %" data-zh="食品成本%" data-zh-tw="食品成本%">Food Cost %</div>
+                        <div class="kpi-icon">🍽️</div>
+                    </div>
+                    <div class="kpi-value">32%</div>
+                    <div class="kpi-target" data-en="Target: 30%" data-zh="目标：30%" data-zh-tw="目標：30%">Target: 30%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 107%;"></div>
+                    </div>
+                    <div class="status-text" data-en="⚠️ At Risk" data-zh="⚠️ 风险" data-zh-tw="⚠️ 风险">⚠️ At Risk</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title" data-en="Labor Cost %" data-zh="人工成本%" data-zh-tw="人工成本%">Labor Cost %</div>
+                        <div class="kpi-icon">👥</div>
+                    </div>
+                    <div class="kpi-value">28.5%</div>
+                    <div class="kpi-target" data-en="Target: 30%" data-zh="目标：30%" data-zh-tw="目標：30%">Target: 30%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 95%;"></div>
+                    </div>
+                    <div class="status-text" data-en="✓ On Track" data-zh="✓ 按计划" data-zh-tw="✓ 按计划">✓ On Track</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title" data-en="Customer Satisfaction" data-zh="客户满意度" data-zh-tw="客户满意度">Customer Satisfaction</div>
+                        <div class="kpi-icon">⭐</div>
+                    </div>
+                    <div class="kpi-value">4.5/5</div>
+                    <div class="kpi-target" data-en="Target: 4.5+" data-zh="目标：4.5+" data-zh-tw="目標：4.5+">Target: 4.5+</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="status-text" data-en="✓ Excellent" data-zh="✓ 优秀" data-zh-tw="✓ 优秀">✓ Excellent</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title" data-en="Table Turnover" data-zh="桌位周转" data-zh-tw="桌位周转">Table Turnover</div>
+                        <div class="kpi-icon">🔄</div>
+                    </div>
+                    <div class="kpi-value">2.8x</div>
+                    <div class="kpi-target" data-en="Target: 2.5x" data-zh="目标：2.5x" data-zh-tw="目標：2.5x">Target: 2.5x</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 112%;"></div>
+                    </div>
+                    <div class="status-text" data-en="✓ Exceeding" data-zh="✓ 超额" data-zh-tw="✓ 超额">✓ Exceeding</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title" data-en="Gross Margin" data-zh="毛利率" data-zh-tw="毛利率">Gross Margin</div>
+                        <div class="kpi-icon">📈</div>
+                    </div>
+                    <div class="kpi-value">39.5%</div>
+                    <div class="kpi-target" data-en="Target: 38%" data-zh="目标：38%" data-zh-tw="目標：38%">Target: 38%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 104%;"></div>
+                    </div>
+                    <div class="status-text" data-en="✓ On Track" data-zh="✓ 按计划" data-zh-tw="✓ 按计划">✓ On Track</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPERATIONS -->
+        <div id="operations" class="content">
+            <div class="table-section">
+                <h3 data-en="Operational KPIs" data-zh="运营关键绩效指标" data-zh-tw="运营關鍵績效指標">📋 Operational KPIs</h3>
+                <table>
+                    <tr>
+                        <th data-en="Metric" data-zh="指标" data-zh-tw="指標">Metric</th>
+                        <th data-en="Current" data-zh="当前" data-zh-tw="当前">Current</th>
+                        <th data-en="Target" data-zh="目标" data-zh-tw="目標">Target</th>
+                        <th data-en="% vs Target" data-zh="相对目标的%" data-zh-tw="相对目標的%">% vs Target</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Table Turnover" data-zh="桌位周转" data-zh-tw="桌位周转">Table Turnover</td>
+                        <td class="amount-cell">2.8x</td>
+                        <td>2.5x</td>
+                        <td>112%</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Average Check Size" data-zh="平均账单金额" data-zh-tw="平均账单金額">Average Check Size</td>
+                        <td class="amount-cell">$28.50</td>
+                        <td>$28.00</td>
+                        <td>101.8%</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Staff Efficiency" data-zh="员工效率" data-zh-tw="員工效率">Staff Efficiency</td>
+                        <td class="amount-cell">$705/hr</td>
+                        <td>$700/hr</td>
+                        <td>100.7%</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Inventory Turnover" data-zh="库存周转" data-zh-tw="库存周转">Inventory Turnover</td>
+                        <td class="amount-cell">8.5x/month</td>
+                        <td>8.0x/month</td>
+                        <td>106.3%</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- FINANCIAL -->
+        <div id="financial" class="content">
+            <div class="table-section">
+                <h3 data-en="Financial KPIs" data-zh="财务关键绩效指标" data-zh-tw="财务關鍵績效指標">💳 Financial KPIs</h3>
+                <table>
+                    <tr>
+                        <th data-en="Metric" data-zh="指标" data-zh-tw="指標">Metric</th>
+                        <th data-en="This Month" data-zh="本月" data-zh-tw="本月">This Month</th>
+                        <th data-en="Target" data-zh="目标" data-zh-tw="目標">Target</th>
+                        <th data-en="Variance" data-zh="差异" data-zh-tw="差异">Variance</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Revenue" data-zh="收入" data-zh-tw="收入">Revenue</td>
+                        <td class="amount-cell">$254,000</td>
+                        <td class="amount-cell">$240,000</td>
+                        <td style="color: #27ae60;">+$14,000</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Food Cost" data-zh="食品成本" data-zh-tw="食品成本">Food Cost</td>
+                        <td class="amount-cell">$81,280</td>
+                        <td class="amount-cell">$72,000</td>
+                        <td style="color: #e74c3c;">-$9,280</td>
+                        <td><span class="status-badge status-at-risk" data-en="At Risk" data-zh="风险" data-zh-tw="风险">At Risk</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Labor Cost" data-zh="人工成本" data-zh-tw="人工成本">Labor Cost</td>
+                        <td class="amount-cell">$72,390</td>
+                        <td class="amount-cell">$72,000</td>
+                        <td style="color: #e74c3c;">-$390</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Gross Profit" data-zh="毛利" data-zh-tw="毛利">Gross Profit</td>
+                        <td class="amount-cell">$100,330</td>
+                        <td class="amount-cell">$96,000</td>
+                        <td style="color: #27ae60;">+$4,330</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- CUSTOMER -->
+        <div id="customer" class="content">
+            <div class="table-section">
+                <h3 data-en="Customer KPIs" data-zh="客户关键绩效指标" data-zh-tw="客户關鍵績效指標">👥 Customer KPIs</h3>
+                <table>
+                    <tr>
+                        <th data-en="Metric" data-zh="指标" data-zh-tw="指標">Metric</th>
+                        <th data-en="Value" data-zh="数值" data-zh-tw="数值">Value</th>
+                        <th data-en="Target" data-zh="目标" data-zh-tw="目標">Target</th>
+                        <th data-en="Trend" data-zh="趋势" data-zh-tw="趋势">Trend</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Customer Satisfaction" data-zh="客户满意度" data-zh-tw="客户满意度">Customer Satisfaction</td>
+                        <td class="amount-cell">4.5/5.0</td>
+                        <td>4.5+</td>
+                        <td data-en="↑ +0.1" data-zh="↑ +0.1" data-zh-tw="↑ +0.1">↑ +0.1</td>
+                        <td><span class="status-badge status-on-track" data-en="Excellent" data-zh="优秀" data-zh-tw="优秀">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Repeat Customer Rate" data-zh="回头客率" data-zh-tw="回头客率">Repeat Customer Rate</td>
+                        <td class="amount-cell">68%</td>
+                        <td>60%</td>
+                        <td data-en="↑ +3%" data-zh="↑ +3%" data-zh-tw="↑ +3%">↑ +3%</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Average Wait Time" data-zh="平均等候时间" data-zh-tw="平均等候时间">Average Wait Time</td>
+                        <td class="amount-cell">8 min</td>
+                        <td>10 min</td>
+                        <td data-en="↑ Improved" data-zh="↑ 改进" data-zh-tw="↑ 改进">↑ Improved</td>
+                        <td><span class="status-badge status-on-track" data-en="On Track" data-zh="按计划" data-zh-tw="按计划">On Track</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Online Reviews Rating" data-zh="在线评价评级" data-zh-tw="在线评价评级">Online Reviews Rating</td>
+                        <td class="amount-cell">4.6/5.0</td>
+                        <td>4.5+</td>
+                        <td data-en="↑ +0.2" data-zh="↑ +0.2" data-zh-tw="↑ +0.2">↑ +0.2</td>
+                        <td><span class="status-badge status-on-track" data-en="Excellent" data-zh="优秀" data-zh-tw="优秀">Excellent</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-en');
+                } else {
+                    el.textContent = el.getAttribute('data-zh');
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense & Procurement - 支出及採購控制</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #cc6b3e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            text-align: center;
+        }
+
+        .metric-label { font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+        .metric-value { font-size: 32px; font-weight: 700; color: #ff6b35; margin-bottom: 8px; font-family: Calibri, monospace; }
+        .metric-change { font-size: 12px; color: #27ae60; }
+
+        .table-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .table-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fff5ed; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; color: #cc6b3e; border-bottom: 2px solid #ffe4d0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #ffe4d0; font-size: 14px; }
+        tr:hover { background: #fff9f4; }
+
+        .amount-cell { font-weight: 600; color: #ff6b35; font-family: Calibri, monospace; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            padding: 24px;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 6px; color: #333; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ffe4d0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid #ff8c42;
+            background: white;
+            color: #ff6b35;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover { background: #ff6b35; color: white; }
+        .btn-primary { background: #ff6b35; color: white; }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .metric-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="💰 Expense & Procurement Control" data-zh="💰 支出及采购控制" data-zh-tw="💰 支出及採購控制">💰 Expense & Procurement Control</h1>
+            <p data-en="Monitor supplier costs, approve expenses, and control procurement budget" data-zh="监控供应商成本，批准支出并控制采购预算" data-zh-tw="监控供應商成本，批准支出并控制採購預算">Monitor supplier costs, approve expenses, and control procurement budget</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')" data-en="Overview" data-zh="概览" data-zh-tw="概覽">Overview</button>
+            <button class="tab" onclick="switchTab('expenses')" data-en="Expenses" data-zh="支出" data-zh-tw="支出">Expenses</button>
+            <button class="tab" onclick="switchTab('procurement')" data-en="Procurement" data-zh="采购" data-zh-tw="採購">Procurement</button>
+            <button class="tab" onclick="switchTab('suppliers')" data-en="Suppliers" data-zh="供应商" data-zh-tw="供應商">Suppliers</button>
+            <button class="tab" onclick="switchTab('reports')" data-en="Reports" data-zh="报告" data-zh-tw="報告">Reports</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="content active">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Budget" data-zh="总预算" data-zh-tw="总預算">Total Budget</div>
+                    <div class="metric-value">$50,000</div>
+                    <div class="metric-change" data-en="Monthly allocation" data-zh="月份分配" data-zh-tw="月份分配">Monthly allocation</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Spent This Month" data-zh="本月支出" data-zh-tw="本月支出">Spent This Month</div>
+                    <div class="metric-value">$28,450</div>
+                    <div class="metric-change" data-en="56.9% of budget" data-zh="占预算的 56.9%" data-zh-tw="占預算的 56.9%">56.9% of budget</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Remaining Budget" data-zh="剩余预算" data-zh-tw="剩余預算">Remaining Budget</div>
+                    <div class="metric-value">$21,550</div>
+                    <div class="metric-change" data-en="43.1% remaining" data-zh="剩余 43.1%" data-zh-tw="剩余 43.1%">43.1% remaining</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Pending Approvals" data-zh="待批准" data-zh-tw="待批准">Pending Approvals</div>
+                    <div class="metric-value">5</div>
+                    <div class="metric-change" data-en="Worth $3,200" data-zh="价值 $3,200" data-zh-tw="价值 $3,200">Worth $3,200</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                ⚠️ <span data-en="Budget alert: 3 suppliers exceeded monthly limits. Chicken supplier at $8,500 (limit: $8,000)" data-zh="预算警报：3 个供应商超出月度限制。鸡肉供应商 $8,500（限制：$8,000）" data-zh-tw="預算警报：3 个供應商超出月度限制。鸡肉供應商 $8,500（限制：$8,000）">Budget alert: 3 suppliers exceeded monthly limits. Chicken supplier at $8,500 (limit: $8,000)</span>
+            </div>
+
+            <div class="table-section">
+                <h3 data-en="Top Expenses This Month" data-zh="本月主要支出" data-zh-tw="本月主要支出">📊 Top Expenses This Month</h3>
+                <table>
+                    <tr>
+                        <th data-en="Supplier" data-zh="供应商" data-zh-tw="供應商">Supplier</th>
+                        <th data-en="Category" data-zh="类别" data-zh-tw="類別">Category</th>
+                        <th data-en="Amount" data-zh="金额" data-zh-tw="金額">Amount</th>
+                        <th data-en="Budget Limit" data-zh="预算限制" data-zh-tw="預算限制">Budget Limit</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Golden Foods Co.</strong></td>
+                        <td data-en="Meat & Poultry" data-zh="肉类禽类" data-zh-tw="肉類禽類">Meat & Poultry</td>
+                        <td class="amount-cell">$8,500.00</td>
+                        <td class="amount-cell">$8,000.00</td>
+                        <td><span class="status-badge status-rejected" data-en="Over Budget" data-zh="超出预算" data-zh-tw="超出預算">Over Budget</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Green Valley Farms</strong></td>
+                        <td data-en="Fresh Produce" data-zh="新鲜农产品" data-zh-tw="新鮮農產品">Fresh Produce</td>
+                        <td class="amount-cell">$6,200.00</td>
+                        <td class="amount-cell">$6,500.00</td>
+                        <td><span class="status-badge status-approved" data-en="Within Budget" data-zh="预算内" data-zh-tw="預算內">Within Budget</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Prime Meats Supply</strong></td>
+                        <td data-en="Specialty Meat" data-zh="特选肉类" data-zh-tw="特选肉类">Specialty Meat</td>
+                        <td class="amount-cell">$5,800.00</td>
+                        <td class="amount-cell">$5,500.00</td>
+                        <td><span class="status-badge status-rejected" data-en="Over Budget" data-zh="超出预算" data-zh-tw="超出預算">Over Budget</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- EXPENSES TAB -->
+        <div id="expenses" class="content">
+            <div class="form-card">
+                <h3 style="margin-bottom: 20px; color: #333;" data-en="Submit Expense Request" data-zh="提交支出请求" data-zh-tw="提交支出请求">Submit Expense Request</h3>
+
+                <div class="form-group">
+                    <label data-en="Expense Type" data-zh="支出类型" data-zh-tw="支出類型">Expense Type</label>
+                    <select>
+                        <option data-en="-- Select Type --" data-zh="-- 选择类型 --" data-zh-tw="-- 选择類型 --">-- Select Type --</option>
+                        <option data-en="Food & Beverage" data-zh="食品饮料" data-zh-tw="食品饮料">Food & Beverage</option>
+                        <option data-en="Supplies" data-zh="用品" data-zh-tw="用品">Supplies</option>
+                        <option data-en="Maintenance" data-zh="维护" data-zh-tw="维护">Maintenance</option>
+                        <option data-en="Utilities" data-zh="公用事业" data-zh-tw="公用事业">Utilities</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Description" data-zh="描述" data-zh-tw="描述">Description</label>
+                    <textarea placeholder="Describe the expense..." rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Amount ($)" data-zh="金额 ($)" data-zh-tw="金額 ($)">Amount ($)</label>
+                    <input type="number" placeholder="e.g., 250.00" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Vendor" data-zh="供应商" data-zh-tw="供應商">Vendor</label>
+                    <input type="text" placeholder="e.g., Golden Foods Co.">
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="alert('Expense submitted for approval')" data-en="✓ Submit for Approval" data-zh="✓ 提交批准" data-zh-tw="✓ 提交批准">✓ Submit for Approval</button>
+            </div>
+
+            <div class="table-section">
+                <h3 data-en="Recent Expense Requests" data-zh="最近支出请求" data-zh-tw="最近支出请求">📋 Recent Expense Requests</h3>
+                <table>
+                    <tr>
+                        <th data-en="Date" data-zh="日期" data-zh-tw="日期">Date</th>
+                        <th data-en="Type" data-zh="类型" data-zh-tw="類型">Type</th>
+                        <th data-en="Amount" data-zh="金额" data-zh-tw="金額">Amount</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td>May 18, 2024</td>
+                        <td data-en="Supplies" data-zh="用品" data-zh-tw="用品">Supplies</td>
+                        <td class="amount-cell">$450.00</td>
+                        <td><span class="status-badge status-approved" data-en="Approved" data-zh="已批准" data-zh-tw="已批准">Approved</span></td>
+                    </tr>
+                    <tr>
+                        <td>May 17, 2024</td>
+                        <td data-en="Maintenance" data-zh="维护" data-zh-tw="维护">Maintenance</td>
+                        <td class="amount-cell">$850.00</td>
+                        <td><span class="status-badge status-pending" data-en="Pending" data-zh="待处理" data-zh-tw="待處理">Pending</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- PROCUREMENT TAB -->
+        <div id="procurement" class="content">
+            <div class="form-card">
+                <h3 style="margin-bottom: 20px; color: #333;" data-en="Create Purchase Order" data-zh="创建采购订单" data-zh-tw="创建採購订单">Create Purchase Order</h3>
+
+                <div class="form-group">
+                    <label data-en="Supplier" data-zh="供应商" data-zh-tw="供應商">Supplier</label>
+                    <select>
+                        <option>Golden Foods Co.</option>
+                        <option>Green Valley Farms</option>
+                        <option>Prime Meats Supply</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Item" data-zh="项目" data-zh-tw="項目">Item</label>
+                    <input type="text" placeholder="e.g., Chicken Breast">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Quantity" data-zh="数量" data-zh-tw="数量">Quantity</label>
+                    <input type="number" placeholder="e.g., 20" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Unit Price" data-zh="单价" data-zh-tw="单价">Unit Price</label>
+                    <input type="number" placeholder="e.g., 12.50" step="0.01">
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="alert('Purchase order created')" data-en="✓ Create Order" data-zh="✓ 创建订单" data-zh-tw="✓ 创建订单">✓ Create Order</button>
+            </div>
+        </div>
+
+        <!-- SUPPLIERS TAB -->
+        <div id="suppliers" class="content">
+            <div class="table-section">
+                <h3 data-en="Supplier Management" data-zh="供应商管理" data-zh-tw="供應商管理">👥 Supplier Management</h3>
+                <table>
+                    <tr>
+                        <th data-en="Supplier Name" data-zh="供应商名称" data-zh-tw="供應商名称">Supplier Name</th>
+                        <th data-en="Category" data-zh="类别" data-zh-tw="類別">Category</th>
+                        <th data-en="Monthly Spend" data-zh="月支出" data-zh-tw="月支出">Monthly Spend</th>
+                        <th data-en="Rating" data-zh="评级" data-zh-tw="评级">Rating</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Golden Foods Co.</strong></td>
+                        <td data-en="Meat & Poultry" data-zh="肉类禽类" data-zh-tw="肉類禽類">Meat & Poultry</td>
+                        <td class="amount-cell">$8,500.00</td>
+                        <td>⭐⭐⭐⭐ (4.5/5)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Green Valley Farms</strong></td>
+                        <td data-en="Fresh Produce" data-zh="新鲜农产品" data-zh-tw="新鮮農產品">Fresh Produce</td>
+                        <td class="amount-cell">$6,200.00</td>
+                        <td>⭐⭐⭐⭐⭐ (5/5)</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- REPORTS TAB -->
+        <div id="reports" class="content">
+            <div class="chart-container">
+                <h3 style="margin-bottom: 16px;" data-en="Budget vs Actual Spending" data-zh="预算与实际支出" data-zh-tw="預算与实际支出">📈 Budget vs Actual Spending</h3>
+                <p style="color: #666; margin-bottom: 12px;" data-en="Monthly comparison chart" data-zh="月度比较图表" data-zh-tw="月度比较图表">Monthly comparison chart</p>
+                <div style="background: linear-gradient(90deg, #ff6b35 0%, #ff8c42 100%); height: 30px; border-radius: 4px; margin-bottom: 8px;"></div>
+                <p style="font-size: 12px; color: #999;" data-en="Budget: $50,000 | Spent: $28,450 | Remaining: $21,550" data-zh="预算：$50,000 | 支出：$28,450 | 剩余：$21,550" data-zh-tw="預算：$50,000 | 支出：$28,450 | 剩余：$21,550">Budget: $50,000 | Spent: $28,450 | Remaining: $21,550</p>
+            </div>
+
+            <div class="table-section">
+                <h3 data-en="Spending by Category" data-zh="按类别支出" data-zh-tw="按類別支出">📊 Spending by Category</h3>
+                <table>
+                    <tr>
+                        <th data-en="Category" data-zh="类别" data-zh-tw="類別">Category</th>
+                        <th data-en="Amount" data-zh="金额" data-zh-tw="金額">Amount</th>
+                        <th data-en="% of Total" data-zh="占总数的百分比" data-zh-tw="占總數的百分比">% of Total</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Food & Beverage" data-zh="食品饮料" data-zh-tw="食品饮料">Food & Beverage</td>
+                        <td class="amount-cell">$18,200.00</td>
+                        <td>64.0%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Supplies" data-zh="用品" data-zh-tw="用品">Supplies</td>
+                        <td class="amount-cell">$5,300.00</td>
+                        <td>18.6%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Maintenance" data-zh="维护" data-zh-tw="维护">Maintenance</td>
+                        <td class="amount-cell">$2,800.00</td>
+                        <td>9.8%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Utilities" data-zh="公用事业" data-zh-tw="公用事业">Utilities</td>
+                        <td class="amount-cell">$2,150.00</td>
+                        <td>7.6%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-en');
+                } else {
+                    el.textContent = el.getAttribute('data-zh');
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

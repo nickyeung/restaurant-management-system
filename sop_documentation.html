@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOP Documentation - 标准作业程序文件</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #cc6b3e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .doc-card {
+            background: white;
+            border: 1px solid #ffe4d0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .doc-card:hover {
+            border-color: #ff8c42;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.1);
+        }
+
+        .doc-title { font-weight: 600; color: #333; font-size: 15px; margin-bottom: 8px; }
+        .doc-desc { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .doc-meta { display: flex; gap: 16px; font-size: 11px; color: #999; }
+
+        .doc-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+        }
+
+        .doc-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+        .doc-section h4 { font-size: 14px; font-weight: 600; color: #333; margin-top: 16px; margin-bottom: 8px; }
+        .doc-section p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+        .doc-section ol { margin-left: 20px; color: #666; font-size: 14px; }
+        .doc-section li { margin-bottom: 8px; }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ffe4d0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        @media (max-width: 600px) {
+            .doc-card { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="📖 SOP Documentation" data-zh="📖 标准作业程序文件" data-zh-tw="📖 標準作業程序文件">📖 SOP Documentation</h1>
+            <p data-en="Standard operating procedures and staff training documentation" data-zh="标准作业程序和员工培训文件" data-zh-tw="標準作業程序和員工培訓文件">Standard operating procedures and staff training documentation</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('library')" data-en="Library" data-zh="库" data-zh-tw="库">Library</button>
+            <button class="tab" onclick="switchTab('food')" data-en="Food Safety" data-zh="食品安全" data-zh-tw="食品安全">Food Safety</button>
+            <button class="tab" onclick="switchTab('service')" data-en="Service" data-zh="服务" data-zh-tw="服務">Service</button>
+            <button class="tab" onclick="switchTab('training')" data-en="Training" data-zh="培训" data-zh-tw="培訓">Training</button>
+        </div>
+
+        <!-- LIBRARY -->
+        <div id="library" class="content active">
+            <input type="text" class="search-box" placeholder="Search SOPs..." data-placeholder-en="Search SOPs..." data-placeholder-zh="搜索标准作业程序...">
+
+            <div class="doc-card" onclick="switchTab('food')">
+                <div class="doc-title">🍽️ <span data-en="Food Handling & Storage" data-zh="食品处理和储存" data-zh-tw="食品處理和储存">Food Handling & Storage</span></div>
+                <div class="doc-desc" data-en="Procedures for proper food storage, temperature control, and expiration date management" data-zh="食品储存、温度控制和过期日期管理的程序" data-zh-tw="食品储存、温度控制和过期日期管理的程序">Procedures for proper food storage, temperature control, and expiration date management</div>
+                <div class="doc-meta">
+                    <span data-en="Last Updated: May 20" data-zh="最后更新：5月20日" data-zh-tw="最后更新：5月20日">Last Updated: May 20</span>
+                    <span class="status-badge" data-en="Active" data-zh="有效" data-zh-tw="有效">Active</span>
+                </div>
+            </div>
+
+            <div class="doc-card" onclick="switchTab('service')">
+                <div class="doc-title">🤝 <span data-en="Customer Service Standards" data-zh="客户服务标准" data-zh-tw="客户服務標準">Customer Service Standards</span></div>
+                <div class="doc-desc" data-en="Service quality expectations, greeting procedures, and complaint resolution protocols" data-zh="服务质量期望、招呼程序和投诉解决协议" data-zh-tw="服務质量期望、招呼程序和投诉解决协议">Service quality expectations, greeting procedures, and complaint resolution protocols</div>
+                <div class="doc-meta">
+                    <span data-en="Last Updated: May 18" data-zh="最后更新：5月18日" data-zh-tw="最后更新：5月18日">Last Updated: May 18</span>
+                    <span class="status-badge" data-en="Active" data-zh="有效" data-zh-tw="有效">Active</span>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-title">💼 <span data-en="Cash Handling Procedures" data-zh="现金处理程序" data-zh-tw="现金處理程序">Cash Handling Procedures</span></div>
+                <div class="doc-desc" data-en="Guidelines for opening/closing register, cash reconciliation, and security protocols" data-zh="打开/关闭收银机、现金对账和安全协议的指南" data-zh-tw="打开/关闭收银机、现金对账和安全协议的指南">Guidelines for opening/closing register, cash reconciliation, and security protocols</div>
+                <div class="doc-meta">
+                    <span data-en="Last Updated: May 15" data-zh="最后更新：5月15日" data-zh-tw="最后更新：5月15日">Last Updated: May 15</span>
+                    <span class="status-badge" data-en="Active" data-zh="有效" data-zh-tw="有效">Active</span>
+                </div>
+            </div>
+
+            <div class="doc-card">
+                <div class="doc-title">🎯 <span data-en="Inventory Management SOP" data-zh="库存管理标准作业程序" data-zh-tw="库存管理標準作業程序">Inventory Management SOP</span></div>
+                <div class="doc-desc" data-en="Stock counting procedures, reorder points, and receiving protocols" data-zh="库存清点程序、重新订购点和接收协议" data-zh-tw="库存清点程序、重新订购点和接收协议">Stock counting procedures, reorder points, and receiving protocols</div>
+                <div class="doc-meta">
+                    <span data-en="Last Updated: May 10" data-zh="最后更新：5月10日" data-zh-tw="最后更新：5月10日">Last Updated: May 10</span>
+                    <span class="status-badge" data-en="Active" data-zh="有效" data-zh-tw="有效">Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOD SAFETY -->
+        <div id="food" class="content">
+            <div class="doc-section">
+                <h3 data-en="Food Handling & Storage SOP" data-zh="食品处理和储存标准作业程序" data-zh-tw="食品處理和储存標準作業程序">🍽️ Food Handling & Storage SOP</h3>
+                
+                <h4 data-en="Temperature Guidelines" data-zh="温度指南" data-zh-tw="温度指南">Temperature Guidelines</h4>
+                <p data-en="All meat products must be stored at 32-39°F (0-4°C). Fish and seafood at 28-32°F. Frozen items at 0°F or below." data-zh="所有肉制品必须储存在 32-39°F (0-4°C)。鱼和海鲜在 28-32°F。冷冻物品在 0°F 或更低。" data-zh-tw="所有肉制品必须储存在 32-39°F (0-4°C)。鱼和海鲜在 28-32°F。冷冻物品在 0°F 或更低。">All meat products must be stored at 32-39°F (0-4°C). Fish and seafood at 28-32°F. Frozen items at 0°F or below.</p>
+
+                <h4 data-en="FIFO System (First In, First Out)" data-zh="先进先出系统" data-zh-tw="先进先出系统">FIFO System (First In, First Out)</h4>
+                <ol>
+                    <li data-en="Check expiration dates upon receiving" data-zh="收到时检查过期日期" data-zh-tw="收到时检查过期日期">Check expiration dates upon receiving</li>
+                    <li data-en="Place older items in front, newer items in back" data-zh="将旧物品放在前面，新物品放在后面" data-zh-tw="将旧物品放在前面，新物品放在后面">Place older items in front, newer items in back</li>
+                    <li data-en="Always use oldest stock first" data-zh="始终先使用最旧的库存" data-zh-tw="始终先使用最旧的库存">Always use oldest stock first</li>
+                    <li data-en="Discard any expired items immediately" data-zh="立即丢弃任何过期物品" data-zh-tw="立即丢弃任何过期物品">Discard any expired items immediately</li>
+                </ol>
+
+                <h4 data-en="Cross-Contamination Prevention" data-zh="交叉污染预防" data-zh-tw="交叉污染预防">Cross-Contamination Prevention</h4>
+                <p data-en="Raw meat must be stored below ready-to-eat foods. Use separate cutting boards for meat, vegetables, and other foods. Wash hands before handling different types of food." data-zh="生肉必须储存在即食食品下方。对肉类、蔬菜和其他食物使用单独的砧板。在处理不同类型的食物之前洗手。" data-zh-tw="生肉必须储存在即食食品下方。对肉类、蔬菜和其他食物使用单独的砧板。在處理不同類型的食物之前洗手。">Raw meat must be stored below ready-to-eat foods. Use separate cutting boards for meat, vegetables, and other foods. Wash hands before handling different types of food.</p>
+            </div>
+        </div>
+
+        <!-- SERVICE -->
+        <div id="service" class="content">
+            <div class="doc-section">
+                <h3 data-en="Customer Service Standards SOP" data-zh="客户服务标准标准作业程序" data-zh-tw="客户服務標準標準作業程序">🤝 Customer Service Standards SOP</h3>
+                
+                <h4 data-en="Greeting Procedures" data-zh="招呼程序" data-zh-tw="招呼程序">Greeting Procedures</h4>
+                <ol>
+                    <li data-en="Greet customers within 2 minutes of arrival" data-zh="在客户到达后2分钟内问候" data-zh-tw="在客户到达后2分钟内问候">Greet customers within 2 minutes of arrival</li>
+                    <li data-en="Use friendly, professional tone" data-zh="使用友好、专业的语气" data-zh-tw="使用友好、专业的语气">Use friendly, professional tone</li>
+                    <li data-en="Offer water and menu" data-zh="提供水和菜单" data-zh-tw="提供水和菜单">Offer water and menu</li>
+                    <li data-en="Take order after 5 minutes" data-zh="5分钟后接单" data-zh-tw="5分钟后接单">Take order after 5 minutes</li>
+                </ol>
+
+                <h4 data-en="Service Quality Standards" data-zh="服务质量标准" data-zh-tw="服務质量標準">Service Quality Standards</h4>
+                <p data-en="Food must be delivered within 15-20 minutes for main courses. Refill water glasses when 1/2 empty. Check in with customers after 2 minutes of receiving food." data-zh="主菜必须在15-20分钟内送达。当水杯装满1/2时补充。在收到食物2分钟后与客户联系。" data-zh-tw="主菜必须在15-20分钟内送达。当水杯装满1/2时补充。在收到食物2分钟后与客户联系。">Food must be delivered within 15-20 minutes for main courses. Refill water glasses when 1/2 empty. Check in with customers after 2 minutes of receiving food.</p>
+
+                <h4 data-en="Complaint Resolution" data-zh="投诉解决" data-zh-tw="投诉解决">Complaint Resolution</h4>
+                <ol>
+                    <li data-en="Listen without interrupting" data-zh="不打断地听" data-zh-tw="不打断地听">Listen without interrupting</li>
+                    <li data-en="Apologize sincerely" data-zh="真诚道歉" data-zh-tw="真诚道歉">Apologize sincerely</li>
+                    <li data-en="Offer solution immediately (remake dish or discount)" data-zh="立即提出解决方案（重做菜肴或折扣）" data-zh-tw="立即提出解决方案（重做菜肴或折扣）">Offer solution immediately (remake dish or discount)</li>
+                    <li data-en="Follow up to ensure satisfaction" data-zh="跟进以确保满意度" data-zh-tw="跟进以确保满意度">Follow up to ensure satisfaction</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- TRAINING -->
+        <div id="training" class="content">
+            <div class="doc-section">
+                <h3 data-en="Staff Training Checklist" data-zh="员工培训清单" data-zh-tw="員工培訓清单">📋 Staff Training Checklist</h3>
+                
+                <h4 data-en="New Hire Onboarding (Day 1)" data-zh="新员工入职（第1天）" data-zh-tw="新員工入职（第1天）">New Hire Onboarding (Day 1)</h4>
+                <ol>
+                    <li data-en="Complete HR paperwork" data-zh="完成人力资源文件" data-zh-tw="完成人力資源文件">Complete HR paperwork</li>
+                    <li data-en="Restaurant tour and orientation" data-zh="餐厅参观和方向" data-zh-tw="餐厅参观和方向">Restaurant tour and orientation</li>
+                    <li data-en="Safety and emergency procedures" data-zh="安全和应急程序" data-zh-tw="安全和应急程序">Safety and emergency procedures</li>
+                    <li data-en="Uniform and equipment setup" data-zh="制服和设备设置" data-zh-tw="制服和设备设置">Uniform and equipment setup</li>
+                </ol>
+
+                <h4 data-en="On-the-Job Training (Week 1-2)" data-zh="在职培训（第1-2周）" data-zh-tw="在职培訓（第1-2周）">On-the-Job Training (Week 1-2)</h4>
+                <ol>
+                    <li data-en="Shadow experienced staff member" data-zh="跟随经验丰富的员工" data-zh-tw="跟随经验丰富的員工">Shadow experienced staff member</li>
+                    <li data-en="Practice POS system" data-zh="练习销售点系统" data-zh-tw="练习销售点系统">Practice POS system</li>
+                    <li data-en="Learn menu items and specials" data-zh="学习菜单项目和特色菜" data-zh-tw="学习菜单項目和特色菜">Learn menu items and specials</li>
+                    <li data-en="Customer service scenarios" data-zh="客户服务场景" data-zh-tw="客户服務场景">Customer service scenarios</li>
+                </ol>
+
+                <h4 data-en="Monthly Training Topics" data-zh="每月培训主题" data-zh-tw="每月培訓主题">Monthly Training Topics</h4>
+                <p data-en="Food safety, customer service excellence, upselling techniques, conflict resolution, and product knowledge updates." data-zh="食品安全、卓越的客户服务、追加销售技巧、冲突解决和产品知识更新。" data-zh-tw="食品安全、卓越的客户服務、追加销售技巧、冲突解决和产品知識更新。">Food safety, customer service excellence, upselling techniques, conflict resolution, and product knowledge updates.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-en');
+                } else {
+                    el.textContent = el.getAttribute('data-zh');
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labor Cost Controls - 人工成本控制</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #cc6b3e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            text-align: center;
+        }
+
+        .metric-label { font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+        .metric-value { font-size: 32px; font-weight: 700; color: #ff6b35; margin-bottom: 8px; font-family: Calibri, monospace; }
+        .metric-change { font-size: 12px; color: #27ae60; }
+
+        .table-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .table-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fff5ed; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; color: #cc6b3e; border-bottom: 2px solid #ffe4d0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #ffe4d0; font-size: 14px; }
+        tr:hover { background: #fff9f4; }
+
+        .amount-cell { font-weight: 600; color: #ff6b35; font-family: Calibri, monospace; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-good { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-alert { background: #f8d7da; color: #721c24; }
+
+        .staff-card {
+            background: linear-gradient(135deg, #fff5ed 0%, #ffe4d0 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #ff8c42;
+            margin-bottom: 12px;
+        }
+
+        .staff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .staff-name { font-weight: 600; color: #ff6b35; font-size: 15px; }
+        .staff-hours { font-size: 16px; font-weight: 700; color: #27ae60; font-family: Calibri, monospace; }
+
+        .staff-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; color: #666; }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .metric-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="👥 Labor Cost Controls" data-zh="👥 人工成本控制" data-zh-tw="👥 人工成本控制">👥 Labor Cost Controls</h1>
+            <p data-en="Monitor staff hours, wages, and labor cost percentage" data-zh="监控员工工作时间、工资和人工成本百分比" data-zh-tw="监控員工工作時間、工資和人工成本百分比">Monitor staff hours, wages, and labor cost percentage</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')" data-en="Overview" data-zh="概览" data-zh-tw="概覽">Overview</button>
+            <button class="tab" onclick="switchTab('staff')" data-en="Staff Schedule" data-zh="员工日程" data-zh-tw="員工日程">Staff Schedule</button>
+            <button class="tab" onclick="switchTab('payroll')" data-en="Payroll" data-zh="薪资" data-zh-tw="薪資">Payroll</button>
+            <button class="tab" onclick="switchTab('analysis')" data-en="Analysis" data-zh="分析" data-zh-tw="分析">Analysis</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="content active">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Staff" data-zh="员工总数" data-zh-tw="員工總數">Total Staff</div>
+                    <div class="metric-value">12</div>
+                    <div class="metric-change" data-en="All active" data-zh="全部在职" data-zh-tw="全部在职">All active</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Monthly Payroll" data-zh="月度薪资" data-zh-tw="月度薪資">Monthly Payroll</div>
+                    <div class="metric-value">$18,500</div>
+                    <div class="metric-change" data-en="This month to date" data-zh="本月截至今日" data-zh-tw="本月截至今日">This month to date</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Labor Cost %" data-zh="人工成本 %" data-zh-tw="人工成本 %">Labor Cost %</div>
+                    <div class="metric-value">28.5%</div>
+                    <div class="metric-change" data-en="Target: 30%" data-zh="目标：30%" data-zh-tw="目標：30%">Target: 30%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Overtime Hours" data-zh="加班时数" data-zh-tw="加班时数">Overtime Hours</div>
+                    <div class="metric-value">24</div>
+                    <div class="metric-change" data-en="This month" data-zh="本月" data-zh-tw="本月">This month</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                ⚠️ <span data-en="Overtime alert: 24 hours logged this month. Monitor staffing levels to reduce overtime costs." data-zh="加班警报：本月已记录 24 小时。监控人员配置以减少加班费用。" data-zh-tw="加班警报：本月已记录 24 小時。监控人员配置以减少加班费用。">Overtime alert: 24 hours logged this month. Monitor staffing levels to reduce overtime costs.</span>
+            </div>
+
+            <div class="table-section">
+                <h3 data-en="Top Staff by Hours" data-zh="按工作时数排名的员工" data-zh-tw="按工作时数排名的員工">📊 Top Staff by Hours</h3>
+                <table>
+                    <tr>
+                        <th data-en="Name" data-zh="名称" data-zh-tw="名称">Name</th>
+                        <th data-en="Position" data-zh="职位" data-zh-tw="职位">Position</th>
+                        <th data-en="Hours This Week" data-zh="本周工作时数" data-zh-tw="本周工作时数">Hours This Week</th>
+                        <th data-en="Hourly Rate" data-zh="时薪" data-zh-tw="時薪">Hourly Rate</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td><strong>David Liu</strong></td>
+                        <td data-en="Head Chef" data-zh="主厨" data-zh-tw="主厨">Head Chef</td>
+                        <td>48</td>
+                        <td class="amount-cell">$18.50</td>
+                        <td><span class="status-badge status-warning" data-en="High Hours" data-zh="工时长" data-zh-tw="工时长">High Hours</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Emma Chen</strong></td>
+                        <td data-en="Sous Chef" data-zh="副主厨" data-zh-tw="副主厨">Sous Chef</td>
+                        <td>44</td>
+                        <td class="amount-cell">$15.00</td>
+                        <td><span class="status-badge status-good" data-en="Normal" data-zh="正常" data-zh-tw="正常">Normal</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mark Wilson</strong></td>
+                        <td data-en="Server" data-zh="服务员" data-zh-tw="服務员">Server</td>
+                        <td>42</td>
+                        <td class="amount-cell">$12.00</td>
+                        <td><span class="status-badge status-good" data-en="Normal" data-zh="正常" data-zh-tw="正常">Normal</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- STAFF SCHEDULE -->
+        <div id="staff" class="content">
+            <h3 style="color: #333; margin-bottom: 16px;" data-en="Week of May 20-26, 2024" data-zh="2024年5月20日至26日" data-zh-tw="2024年5月20日至26日">Week of May 20-26, 2024</h3>
+
+            <div class="staff-card">
+                <div class="staff-header">
+                    <div>
+                        <div class="staff-name">David Liu</div>
+                        <div style="font-size: 12px; color: #999;" data-en="Head Chef" data-zh="主厨" data-zh-tw="主厨">Head Chef</div>
+                    </div>
+                    <div class="staff-hours">48 hrs</div>
+                </div>
+                <div class="staff-info">
+                    <div>Mon-Fri: 10am-6pm</div>
+                    <div data-en="Sat: 12pm-8pm" data-zh="周六：下午12点至下午8点" data-zh-tw="周六：下午12点至下午8点">Sat: 12pm-8pm</div>
+                </div>
+            </div>
+
+            <div class="staff-card">
+                <div class="staff-header">
+                    <div>
+                        <div class="staff-name">Emma Chen</div>
+                        <div style="font-size: 12px; color: #999;" data-en="Sous Chef" data-zh="副主厨" data-zh-tw="副主厨">Sous Chef</div>
+                    </div>
+                    <div class="staff-hours">44 hrs</div>
+                </div>
+                <div class="staff-info">
+                    <div>Mon-Sat: 11am-5pm</div>
+                    <div data-en="(Rotating breaks)" data-zh="（轮流休息）" data-zh-tw="（轮流休息）">(Rotating breaks)</div>
+                </div>
+            </div>
+
+            <div class="staff-card">
+                <div class="staff-header">
+                    <div>
+                        <div class="staff-name">Mark Wilson</div>
+                        <div style="font-size: 12px; color: #999;" data-en="Server" data-zh="服务员" data-zh-tw="服務员">Server</div>
+                    </div>
+                    <div class="staff-hours">40 hrs</div>
+                </div>
+                <div class="staff-info">
+                    <div>Tue-Sat: 4pm-10pm</div>
+                    <div data-en="Sun: 11am-4pm" data-zh="周日：上午11点至下午4点" data-zh-tw="周日：上午11点至下午4点">Sun: 11am-4pm</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAYROLL -->
+        <div id="payroll" class="content">
+            <div class="table-section">
+                <h3 data-en="Current Payroll Cycle" data-zh="当前薪资周期" data-zh-tw="当前薪資周期">💳 Current Payroll Cycle</h3>
+                <table>
+                    <tr>
+                        <th data-en="Employee" data-zh="员工" data-zh-tw="員工">Employee</th>
+                        <th data-en="Base Hours" data-zh="基础工时" data-zh-tw="基础工时">Base Hours</th>
+                        <th data-en="Overtime" data-zh="加班" data-zh-tw="加班">Overtime</th>
+                        <th data-en="Gross Pay" data-zh="总工资" data-zh-tw="总工資">Gross Pay</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td><strong>David Liu</strong></td>
+                        <td>40</td>
+                        <td>8</td>
+                        <td class="amount-cell">$888.00</td>
+                        <td><span class="status-badge status-good" data-en="Pending" data-zh="待处理" data-zh-tw="待處理">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Emma Chen</strong></td>
+                        <td>40</td>
+                        <td>4</td>
+                        <td class="amount-cell">$660.00</td>
+                        <td><span class="status-badge status-good" data-en="Pending" data-zh="待处理" data-zh-tw="待處理">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mark Wilson</strong></td>
+                        <td>40</td>
+                        <td>2</td>
+                        <td class="amount-cell">$504.00</td>
+                        <td><span class="status-badge status-good" data-en="Pending" data-zh="待处理" data-zh-tw="待處理">Pending</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ANALYSIS -->
+        <div id="analysis" class="content">
+            <div class="table-section">
+                <h3 data-en="Labor Cost Analysis" data-zh="人工成本分析" data-zh-tw="人工成本分析">📈 Labor Cost Analysis</h3>
+                <table>
+                    <tr>
+                        <th data-en="Metric" data-zh="指标" data-zh-tw="指標">Metric</th>
+                        <th data-en="This Month" data-zh="本月" data-zh-tw="本月">This Month</th>
+                        <th data-en="Last Month" data-zh="上个月" data-zh-tw="上个月">Last Month</th>
+                        <th data-en="Change" data-zh="变化" data-zh-tw="变化">Change</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Total Payroll" data-zh="总薪资" data-zh-tw="总薪資">Total Payroll</td>
+                        <td class="amount-cell">$18,500.00</td>
+                        <td class="amount-cell">$17,200.00</td>
+                        <td style="color: #e74c3c;">+$1,300 (+7.6%)</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Overtime Cost" data-zh="加班费" data-zh-tw="加班费">Overtime Cost</td>
+                        <td class="amount-cell">$840.00</td>
+                        <td class="amount-cell">$450.00</td>
+                        <td style="color: #e74c3c;">+$390 (+86.7%)</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Labor Cost %" data-zh="人工成本 %" data-zh-tw="人工成本 %">Labor Cost %</td>
+                        <td class="amount-cell">28.5%</td>
+                        <td class="amount-cell">26.5%</td>
+                        <td style="color: #e74c3c;">+2.0%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Avg Hours/Staff" data-zh="平均工时/员工" data-zh-tw="平均工时/員工">Avg Hours/Staff</td>
+                        <td class="amount-cell">43.2</td>
+                        <td class="amount-cell">40.0</td>
+                        <td style="color: #e74c3c;">+3.2 hrs</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-en');
+                } else {
+                    el.textContent = el.getAttribute('data-zh');
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

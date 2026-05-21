@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management System - 餐厅管理系统 - 餐廳管理系統</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Calibri, "Segoe UI", Roboto, sans-serif; 
+            background: linear-gradient(135deg, #fef9f3 0%, #ffe4d0 100%);
+            min-height: 100vh;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 10px 18px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .lang-btn:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            margin-top: 30px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff6b35;
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(255, 107, 53, 0.2);
+            border-color: #ff6b35;
+        }
+
+        .module-header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .module-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .module-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .module-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .module-body {
+            padding: 20px;
+        }
+
+        .module-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .module-features {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .feature-item {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-item:before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .module-footer {
+            border-top: 1px solid #ffe4d0;
+            padding-top: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-open {
+            flex: 1;
+            padding: 10px 16px;
+            background: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: Calibri, sans-serif;
+        }
+
+        .btn-open:hover {
+            background: #ff5520;
+            transform: scale(1.02);
+        }
+
+        .stats-section {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .stats-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff5ed 0%, #ffe4d0 100%);
+            border-radius: 12px;
+            border: 1px solid #ff8c42;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ff6b35;
+            margin-bottom: 8px;
+            font-family: Calibri, monospace;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .footer-link {
+            color: #ff6b35;
+            text-decoration: none;
+            margin: 0 4px;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: #d4edda;
+            color: #155724;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .module-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+        <button class="lang-btn" onclick="setLanguage('zh-tw')">繁體中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="🍽️ Restaurant Management System" data-zh="🍽️ 餐厅管理系统" data-zh-tw="🍽️ 餐廳管理系統">🍽️ Restaurant Management System</h1>
+            <p data-en="Complete solution for modern restaurant operations" data-zh="现代餐厅运营的完整解决方案" data-zh-tw="現代餐廳運營的完整解決方案">Complete solution for modern restaurant operations</p>
+            <p class="header-subtitle" data-en="Select a module below to get started" data-zh="选择下面的模块开始" data-zh-tw="選擇下面的模塊開始">Select a module below to get started</p>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-title" data-en="System Overview" data-zh="系统概览" data-zh-tw="系統概覽">System Overview</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label" data-en="Total Modules" data-zh="总模块数" data-zh-tw="總模塊數">Total Modules</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label" data-en="Languages" data-zh="语言" data-zh-tw="語言">Languages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label" data-en="Trilingual" data-zh="三语" data-zh-tw="三語">Trilingual</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label" data-en="Scalable" data-zh="可扩展" data-zh-tw="可擴展">Scalable</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="module-grid">
+            <!-- MODULE 1: CASH MANAGEMENT -->
+            <div class="module-card" onclick="openModule('cash_management_dashboard.html')">
+                <div class="module-header">
+                    <span class="module-icon">💳</span>
+                    <div class="module-title" data-en="Cash Management" data-zh="现金管理" data-zh-tw="現金管理">Cash Management</div>
+                    <div class="module-subtitle" data-en="Real-time cash tracking" data-zh="实时现金追踪" data-zh-tw="實時現金追蹤">Real-time cash tracking</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Monitor POS transactions, cash handling, shift closing, and daily reconciliation." data-zh="监控销售点交易、现金处理、班次结束和每日对账。" data-zh-tw="監控銷售點交易、現金處理、班次結束和每日對帳。">Monitor POS transactions, cash handling, shift closing, and daily reconciliation.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="Daily cash summary" data-zh="每日现金汇总" data-zh-tw="每日現金彙總">Daily cash summary</span>
+                        <span class="feature-item" data-en="Shift reconciliation" data-zh="班次对账" data-zh-tw="班次對帳">Shift reconciliation</span>
+                        <span class="feature-item" data-en="Variance detection" data-zh="差异检测" data-zh-tw="差異檢測">Variance detection</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 2: POS SYSTEM -->
+            <div class="module-card" onclick="openModule('pos_system.html')">
+                <div class="module-header">
+                    <span class="module-icon">🍱</span>
+                    <div class="module-title" data-en="POS System" data-zh="销售点系统" data-zh-tw="銷售點系統">POS System</div>
+                    <div class="module-subtitle" data-en="Order & payment processing" data-zh="订单和支付处理" data-zh-tw="訂單和支付處理">Order & payment processing</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Point of sale system with menu, shopping cart, and payment processing capabilities." data-zh="具有菜单、购物车和支付处理功能的销售点系统。" data-zh-tw="具有菜單、購物車和支付處理功能的銷售點系統。">Point of sale system with menu, shopping cart, and payment processing capabilities.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="Menu management" data-zh="菜单管理" data-zh-tw="菜單管理">Menu management</span>
+                        <span class="feature-item" data-en="Real-time calculation" data-zh="实时计算" data-zh-tw="實時計算">Real-time calculation</span>
+                        <span class="feature-item" data-en="Multiple payment methods" data-zh="多种支付方式" data-zh-tw="多種支付方式">Multiple payment methods</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 3: INVENTORY -->
+            <div class="module-card" onclick="openModule('inventory_system.html')">
+                <div class="module-header">
+                    <span class="module-icon">📦</span>
+                    <div class="module-title" data-en="Inventory Management" data-zh="库存管理" data-zh-tw="庫存管理">Inventory Management</div>
+                    <div class="module-subtitle" data-en="Stock tracking & costs" data-zh="库存追踪和成本" data-zh-tw="庫存追蹤和成本">Stock tracking & costs</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Track food ingredients, monitor costs, receive automated alerts, and perform cost analysis." data-zh="跟踪食材、监控成本、接收自动警报并进行成本分析。" data-zh-tw="跟蹤食材、監控成本、接收自動警報並進行成本分析。">Track food ingredients, monitor costs, receive automated alerts, and perform cost analysis.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="Stock level alerts" data-zh="库存水平警报" data-zh-tw="庫存水平警報">Stock level alerts</span>
+                        <span class="feature-item" data-en="Cost analysis" data-zh="成本分析" data-zh-tw="成本分析">Cost analysis</span>
+                        <span class="feature-item" data-en="Receiving forms" data-zh="接收表单" data-zh-tw="接收表單">Receiving forms</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 4: EXPENSE & PROCUREMENT -->
+            <div class="module-card" onclick="openModule('expense_procurement.html')">
+                <div class="module-header">
+                    <span class="module-icon">💰</span>
+                    <div class="module-title" data-en="Expense & Procurement" data-zh="支出及采购" data-zh-tw="支出及採購">Expense & Procurement</div>
+                    <div class="module-subtitle" data-en="Budget & supplier control" data-zh="预算和供应商控制" data-zh-tw="預算和供應商控制">Budget & supplier control</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Monitor supplier costs, approve expenses, control procurement budget, and manage suppliers." data-zh="监控供应商成本、批准支出、控制采购预算和管理供应商。" data-zh-tw="監控供應商成本、批准支出、控制採購預算和管理供應商。">Monitor supplier costs, approve expenses, control procurement budget, and manage suppliers.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="Budget monitoring" data-zh="预算监控" data-zh-tw="預算監控">Budget monitoring</span>
+                        <span class="feature-item" data-en="Expense requests" data-zh="支出请求" data-zh-tw="支出請求">Expense requests</span>
+                        <span class="feature-item" data-en="Supplier ratings" data-zh="供应商评级" data-zh-tw="供應商評級">Supplier ratings</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 5: LABOR COST -->
+            <div class="module-card" onclick="openModule('labor_cost_controls.html')">
+                <div class="module-header">
+                    <span class="module-icon">👥</span>
+                    <div class="module-title" data-en="Labor Cost Controls" data-zh="人工成本控制" data-zh-tw="人工成本控制">Labor Cost Controls</div>
+                    <div class="module-subtitle" data-en="Staff & payroll management" data-zh="员工和薪资管理" data-zh-tw="員工和薪資管理">Staff & payroll management</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Monitor staff hours, wages, labor cost percentage, and payroll analysis." data-zh="监控员工工作时间、工资、人工成本百分比和薪资分析。" data-zh-tw="監控員工工作時間、工資、人工成本百分比和薪資分析。">Monitor staff hours, wages, labor cost percentage, and payroll analysis.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="Staff scheduling" data-zh="员工日程" data-zh-tw="員工日程">Staff scheduling</span>
+                        <span class="feature-item" data-en="Payroll tracking" data-zh="薪资追踪" data-zh-tw="薪資追蹤">Payroll tracking</span>
+                        <span class="feature-item" data-en="Overtime monitoring" data-zh="加班监控" data-zh-tw="加班監控">Overtime monitoring</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 6: KPI MONITORING -->
+            <div class="module-card" onclick="openModule('kpi_monitoring.html')">
+                <div class="module-header">
+                    <span class="module-icon">📊</span>
+                    <div class="module-title" data-en="KPI Monitoring" data-zh="关键绩效指标" data-zh-tw="關鍵績效指標">KPI Monitoring</div>
+                    <div class="module-subtitle" data-en="Performance dashboard" data-zh="性能仪表板" data-zh-tw="性能儀表板">Performance dashboard</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Track key performance indicators including revenue, costs, satisfaction, and growth metrics." data-zh="追踪关键绩效指标，包括收入、成本、满意度和增长指标。" data-zh-tw="追蹤關鍵績效指標，包括收入、成本、滿意度和增長指標。">Track key performance indicators including revenue, costs, satisfaction, and growth metrics.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="6 main KPIs" data-zh="6个主要KPI" data-zh-tw="6個主要KPI">6 main KPIs</span>
+                        <span class="feature-item" data-en="Progress tracking" data-zh="进度追踪" data-zh-tw="進度追蹤">Progress tracking</span>
+                        <span class="feature-item" data-en="Detailed reports" data-zh="详细报告" data-zh-tw="詳細報告">Detailed reports</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 7: SOP DOCUMENTATION -->
+            <div class="module-card" onclick="openModule('sop_documentation.html')">
+                <div class="module-header">
+                    <span class="module-icon">📖</span>
+                    <div class="module-title" data-en="SOP Documentation" data-zh="标准作业程序" data-zh-tw="標準作業程序">SOP Documentation</div>
+                    <div class="module-subtitle" data-en="Training & procedures" data-zh="培训和程序" data-zh-tw="培訓和程序">Training & procedures</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Standard operating procedures and staff training documentation including food safety and service standards." data-zh="标准作业程序和员工培训文件，包括食品安全和服务标准。" data-zh-tw="標準作業程序和員工培訓文件，包括食品安全和服務標準。">Standard operating procedures and staff training documentation including food safety and service standards.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="Food handling SOP" data-zh="食品处理标准作业程序" data-zh-tw="食品處理標準作業程序">Food handling SOP</span>
+                        <span class="feature-item" data-en="Service standards" data-zh="服务标准" data-zh-tw="服務標準">Service standards</span>
+                        <span class="feature-item" data-en="Training guides" data-zh="培训指南" data-zh-tw="培訓指南">Training guides</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE 8: ADVISORY SERVICES -->
+            <div class="module-card" onclick="openModule('advisory_services.html')">
+                <div class="module-header">
+                    <span class="module-icon">🎓</span>
+                    <div class="module-title" data-en="Advisory Services" data-zh="顾问服务" data-zh-tw="顧問服務">Advisory Services</div>
+                    <div class="module-subtitle" data-en="Expert consultation" data-zh="专家咨询" data-zh-tw="專家諮詢">Expert consultation</div>
+                </div>
+                <div class="module-body">
+                    <div class="module-desc" data-en="Expert consultation and strategic guidance for restaurant optimization, growth, and excellence." data-zh="餐厅优化、增长和卓越的专家咨询和战略指导。" data-zh-tw="餐廳優化、增長和卓越的專家諮詢和戰略指導。">Expert consultation and strategic guidance for restaurant optimization, growth, and excellence.</div>
+                    <div class="module-features">
+                        <span class="feature-item" data-en="6 service areas" data-zh="6个服务领域" data-zh-tw="6個服務領域">6 service areas</span>
+                        <span class="feature-item" data-en="Expert advisors" data-zh="专家顾问" data-zh-tw="專家顧問">Expert advisors</span>
+                        <span class="feature-item" data-en="Knowledge center" data-zh="知识中心" data-zh-tw="知識中心">Knowledge center</span>
+                    </div>
+                    <div class="module-footer">
+                        <button class="btn-open" data-en="Open Module" data-zh="打开模块" data-zh-tw="打開模塊">Open Module</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-title" data-en="Key Features" data-zh="主要功能" data-zh-tw="主要功能">Key Features</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">✓</div>
+                    <div class="stat-label" data-en="Fully Responsive" data-zh="完全响应式" data-zh-tw="完全響應式">Fully Responsive</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">✓</div>
+                    <div class="stat-label" data-en="Real-time Data" data-zh="实时数据" data-zh-tw="實時數據">Real-time Data</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">✓</div>
+                    <div class="stat-label" data-en="User Friendly" data-zh="用户友好" data-zh-tw="用戶友好">User Friendly</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">✓</div>
+                    <div class="stat-label" data-en="Zero Setup" data-zh="零设置" data-zh-tw="零設置">Zero Setup</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p data-en="Restaurant Management System v1.0 | All Rights Reserved | Built for Modern Restaurants" data-zh="餐厅管理系统 v1.0 | 版权所有 | 为现代餐厅而建" data-zh-tw="餐廳管理系統 v1.0 | 版權所有 | 為現代餐廳而建">Restaurant Management System v1.0 | All Rights Reserved | Built for Modern Restaurants</p>
+            <div class="version-badge" data-en="Production Ready" data-zh="生产就绪" data-zh-tw="生產就緒">Production Ready</div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                let text = '';
+                if (lang === 'en') {
+                    text = el.getAttribute('data-en');
+                } else if (lang === 'zh') {
+                    text = el.getAttribute('data-zh');
+                } else if (lang === 'zh-tw') {
+                    text = el.getAttribute('data-zh-tw');
+                }
+                if (text) {
+                    el.textContent = text;
+                }
+            });
+        }
+
+        function openModule(filename) {
+            window.location.href = filename;
+        }
+
+        // Allow opening module by clicking card
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.style.cursor = 'pointer';
+        });
+    </script>
+</body>
+</html>

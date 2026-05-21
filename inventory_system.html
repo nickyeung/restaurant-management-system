@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management - 库存管理 - 庫存管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px; border: 2px solid #ff6b35; background: white; color: #ff6b35;
+            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s;
+        }
+
+        .lang-btn.active { background: #ff6b35; color: white; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white; padding: 30px; border-radius: 16px; margin-bottom: 30px; margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px; overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px; background: none; border: none; border-bottom: 3px solid transparent;
+            cursor: pointer; font-size: 15px; font-weight: 500; color: #cc6b3e; transition: all 0.3s; white-space: nowrap;
+        }
+
+        .tab.active { color: #ff6b35; border-bottom-color: #ff6b35; }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .metric-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white; padding: 20px; border-radius: 12px; border: 1px solid #ffe4d0; text-align: center;
+        }
+
+        .metric-label { font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+        .metric-value { font-size: 32px; font-weight: 700; color: #ff6b35; margin-bottom: 8px; font-family: Calibri, monospace; }
+        .metric-change { font-size: 12px; color: #27ae60; }
+
+        .table-section {
+            background: white; padding: 24px; border-radius: 12px; border: 1px solid #ffe4d0; margin-bottom: 20px; overflow-x: auto;
+        }
+
+        .table-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fff5ed; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; color: #cc6b3e; border-bottom: 2px solid #ffe4d0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #ffe4d0; font-size: 14px; }
+        tr:hover { background: #fff9f4; }
+
+        .amount-cell { font-weight: 600; color: #ff6b35; font-family: Calibri, monospace; }
+
+        .status-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500;
+        }
+
+        .status-good { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-critical { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+        <button class="lang-btn" onclick="setLanguage('zh-tw')">繁體中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="📦 Inventory Management" data-zh="📦 库存管理" data-zh-tw="📦 庫存管理">📦 Inventory Management</h1>
+            <p data-en="Monitor stock levels and control costs" data-zh="监控库存水平和控制成本" data-zh-tw="監控庫存水平和控制成本">Monitor stock levels and control costs</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')" data-en="Overview" data-zh="概览" data-zh-tw="概覽">Overview</button>
+            <button class="tab" onclick="switchTab('inventory')" data-en="Inventory" data-zh="库存" data-zh-tw="庫存">Inventory</button>
+            <button class="tab" onclick="switchTab('receiving')" data-en="Receiving" data-zh="接收" data-zh-tw="接收">Receiving</button>
+            <button class="tab" onclick="switchTab('analysis')" data-en="Analysis" data-zh="分析" data-zh-tw="分析">Analysis</button>
+        </div>
+
+        <div id="overview" class="content active">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Items" data-zh="总项目数" data-zh-tw="總項目數">Total Items</div>
+                    <div class="metric-value">145</div>
+                    <div class="metric-change" data-en="In stock" data-zh="有货" data-zh-tw="有貨">In stock</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Inventory Value" data-zh="库存价值" data-zh-tw="庫存價值">Inventory Value</div>
+                    <div class="metric-value">$23,450</div>
+                    <div class="metric-change" data-en="Total cost" data-zh="总成本" data-zh-tw="總成本">Total cost</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Low Stock Items" data-zh="低库存项目" data-zh-tw="低庫存項目">Low Stock Items</div>
+                    <div class="metric-value">8</div>
+                    <div class="metric-change" data-en="Need reorder" data-zh="需要重新订购" data-zh-tw="需要重新訂購">Need reorder</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Stock Accuracy" data-zh="库存准确性" data-zh-tw="庫存準確性">Stock Accuracy</div>
+                    <div class="metric-value">98.5%</div>
+                    <div class="metric-change" data-en="Excellent" data-zh="优秀" data-zh-tw="優秀">Excellent</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <h3 data-en="Top Items by Value" data-zh="按价值排名的热门项目" data-zh-tw="按價值排名的熱門項目">📊 Top Items by Value</h3>
+                <table>
+                    <tr>
+                        <th data-en="Item" data-zh="项目" data-zh-tw="項目">Item</th>
+                        <th data-en="Quantity" data-zh="数量" data-zh-tw="數量">Quantity</th>
+                        <th data-en="Unit Price" data-zh="单价" data-zh-tw="單價">Unit Price</th>
+                        <th data-en="Total Value" data-zh="总价值" data-zh-tw="總價值">Total Value</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Chicken Breast" data-zh="鸡胸肉" data-zh-tw="雞胸肉">Chicken Breast</td>
+                        <td>45</td>
+                        <td class="amount-cell">$12.50</td>
+                        <td class="amount-cell">$562.50</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Rice (10kg)" data-zh="米 (10kg)" data-zh-tw="米 (10kg)">Rice (10kg)</td>
+                        <td>12</td>
+                        <td class="amount-cell">$25.00</td>
+                        <td class="amount-cell">$300.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="inventory" class="content">
+            <div class="table-section">
+                <h3 data-en="Inventory List" data-zh="库存列表" data-zh-tw="庫存清單">📋 Inventory List</h3>
+                <table>
+                    <tr>
+                        <th data-en="Item" data-zh="项目" data-zh-tw="項目">Item</th>
+                        <th data-en="Quantity" data-zh="数量" data-zh-tw="數量">Quantity</th>
+                        <th data-en="Reorder Point" data-zh="重新订购点" data-zh-tw="重新訂購點">Reorder Point</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Chicken Breast" data-zh="鸡胸肉" data-zh-tw="雞胸肉">Chicken Breast</td>
+                        <td>45</td>
+                        <td>20</td>
+                        <td><span class="status-badge status-good" data-en="OK" data-zh="确定" data-zh-tw="確定">OK</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Fish Fillets" data-zh="鱼片" data-zh-tw="魚片">Fish Fillets</td>
+                        <td>5</td>
+                        <td>15</td>
+                        <td><span class="status-badge status-critical" data-en="Low" data-zh="低" data-zh-tw="低">Low</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="receiving" class="content">
+            <div class="table-section">
+                <h3 data-en="Recent Receipts" data-zh="最近的收据" data-zh-tw="最近的收據">📥 Recent Receipts</h3>
+                <table>
+                    <tr>
+                        <th data-en="Date" data-zh="日期" data-zh-tw="日期">Date</th>
+                        <th data-en="Item" data-zh="项目" data-zh-tw="項目">Item</th>
+                        <th data-en="Quantity" data-zh="数量" data-zh-tw="數量">Quantity</th>
+                        <th data-en="Cost" data-zh="成本" data-zh-tw="成本">Cost</th>
+                    </tr>
+                    <tr>
+                        <td>May 19, 2024</td>
+                        <td data-en="Vegetables" data-zh="蔬菜" data-zh-tw="蔬菜">Vegetables</td>
+                        <td>50</td>
+                        <td class="amount-cell">$125.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="analysis" class="content">
+            <div class="table-section">
+                <h3 data-en="Cost Analysis" data-zh="成本分析" data-zh-tw="成本分析">📈 Cost Analysis</h3>
+                <table>
+                    <tr>
+                        <th data-en="Category" data-zh="类别" data-zh-tw="類別">Category</th>
+                        <th data-en="Items" data-zh="项目" data-zh-tw="項目">Items</th>
+                        <th data-en="Total Cost" data-zh="总成本" data-zh-tw="總成本">Total Cost</th>
+                        <th data-en="% of Total" data-zh="占总数的百分比" data-zh-tw="占總數的百分比">% of Total</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Meat & Poultry" data-zh="肉类和家禽" data-zh-tw="肉類和家禽">Meat & Poultry</td>
+                        <td>35</td>
+                        <td class="amount-cell">$8,450.00</td>
+                        <td>36%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Vegetables" data-zh="蔬菜" data-zh-tw="蔬菜">Vegetables</td>
+                        <td>42</td>
+                        <td class="amount-cell">$3,250.00</td>
+                        <td>14%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                let text = '';
+                if (lang === 'en') {
+                    text = el.getAttribute('data-en');
+                } else if (lang === 'zh') {
+                    text = el.getAttribute('data-zh');
+                } else if (lang === 'zh-tw') {
+                    text = el.getAttribute('data-zh-tw');
+                }
+                if (text) el.textContent = text;
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

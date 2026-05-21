@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advisory Services - 顾问服务</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #cc6b3e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .service-card:hover {
+            border-color: #ff8c42;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.1);
+        }
+
+        .service-icon { font-size: 32px; margin-bottom: 12px; }
+        .service-title { font-weight: 600; color: #333; font-size: 15px; margin-bottom: 8px; }
+        .service-desc { font-size: 12px; color: #999; }
+
+        .section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+        }
+
+        .section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+        .section h4 { font-size: 14px; font-weight: 600; color: #333; margin-top: 16px; margin-bottom: 8px; }
+        .section p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 12px; }
+
+        .advisor-card {
+            background: linear-gradient(135deg, #fff5ed 0%, #ffe4d0 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #ff8c42;
+            margin-bottom: 12px;
+        }
+
+        .advisor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .advisor-name { font-weight: 600; color: #ff6b35; font-size: 15px; }
+        .advisor-role { font-size: 12px; color: #999; }
+        .advisor-expertise { font-size: 12px; color: #666; }
+
+        .contact-form {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            max-width: 600px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 6px; color: #333; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ffe4d0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Calibri, sans-serif;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: 1px solid #ff8c42;
+            background: white;
+            color: #ff6b35;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+
+        .btn-primary:hover { background: #ff5520; }
+
+        @media (max-width: 600px) {
+            .service-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="🎓 Advisory Services" data-zh="🎓 顾问服务" data-zh-tw="🎓 顧問服務">🎓 Advisory Services</h1>
+            <p data-en="Expert consultation and strategic guidance for restaurant optimization" data-zh="餐厅优化的专家咨询和战略指导" data-zh-tw="餐厅优化的專家諮詢和战略指导">Expert consultation and strategic guidance for restaurant optimization</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('services')" data-en="Services" data-zh="服务" data-zh-tw="服務">Services</button>
+            <button class="tab" onclick="switchTab('advisors')" data-en="Our Advisors" data-zh="我们的顾问" data-zh-tw="我们的顧問">Our Advisors</button>
+            <button class="tab" onclick="switchTab('request')" data-en="Request Consultation" data-zh="请求咨询" data-zh-tw="请求諮詢">Request Consultation</button>
+            <button class="tab" onclick="switchTab('resources')" data-en="Resources" data-zh="资源" data-zh-tw="資源">Resources</button>
+        </div>
+
+        <!-- SERVICES -->
+        <div id="services" class="content active">
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-icon">💰</div>
+                    <div class="service-title" data-en="Financial Optimization" data-zh="财务优化" data-zh-tw="财务优化">Financial Optimization</div>
+                    <div class="service-desc" data-en="Reduce food and labor costs while maximizing revenue and profitability." data-zh="在最大化收入和盈利能力的同时降低食品和劳动力成本。" data-zh-tw="在最大化收入和盈利能力的同时降低食品和劳动力成本。">Reduce food and labor costs while maximizing revenue and profitability.</div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📊</div>
+                    <div class="service-title" data-en="Menu Engineering" data-zh="菜单工程" data-zh-tw="菜单工程">Menu Engineering</div>
+                    <div class="service-desc" data-en="Design profitable menus with optimal pricing and item placement strategies." data-zh="通过最佳定价和项目放置策略设计盈利菜单。" data-zh-tw="通过最佳定价和項目放置策略设计盈利菜单。">Design profitable menus with optimal pricing and item placement strategies.</div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">👥</div>
+                    <div class="service-title" data-en="Staff Training & Development" data-zh="员工培训与发展" data-zh-tw="員工培訓与发展">Staff Training & Development</div>
+                    <div class="service-desc" data-en="Develop high-performing teams and improve customer service excellence." data-zh="建立高效团队并提高客户服务卓越性。" data-zh-tw="建立高效团队并提高客户服務卓越性。">Develop high-performing teams and improve customer service excellence.</div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🔄</div>
+                    <div class="service-title" data-en="Operations & Efficiency" data-zh="运营和效率" data-zh-tw="运营和效率">Operations & Efficiency</div>
+                    <div class="service-desc" data-en="Streamline workflows, reduce waste, and improve operational efficiency." data-zh="简化工作流程，减少浪费并提高运营效率。" data-zh-tw="简化工作流程，减少浪费并提高运营效率。">Streamline workflows, reduce waste, and improve operational efficiency.</div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">⭐</div>
+                    <div class="service-title" data-en="Customer Experience" data-zh="客户体验" data-zh-tw="客户体验">Customer Experience</div>
+                    <div class="service-desc" data-en="Enhance diner satisfaction, loyalty, and repeat visit rates." data-zh="提高食客满意度、忠诚度和重复访问率。" data-zh-tw="提高食客满意度、忠诚度和重复访问率。">Enhance diner satisfaction, loyalty, and repeat visit rates.</div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📈</div>
+                    <div class="service-title" data-en="Growth Strategy" data-zh="增长战略" data-zh-tw="增长战略">Growth Strategy</div>
+                    <div class="service-desc" data-en="Plan expansion, new locations, or franchise opportunities." data-zh="规划扩展、新地点或特许经营机会。" data-zh-tw="规划扩展、新地点或特许经营机会。">Plan expansion, new locations, or franchise opportunities.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADVISORS -->
+        <div id="advisors" class="content">
+            <h3 style="color: #333; margin-bottom: 20px;" data-en="Meet Our Expert Advisors" data-zh="认识我们的专家顾问" data-zh-tw="认识我们的專家顧問">Meet Our Expert Advisors</h3>
+
+            <div class="advisor-card">
+                <div class="advisor-header">
+                    <div>
+                        <div class="advisor-name">Michael Wong</div>
+                        <div class="advisor-role" data-en="Executive Chef & Operations" data-zh="行政主厨和运营" data-zh-tw="行政主厨和运营">Executive Chef & Operations</div>
+                    </div>
+                    <div style="font-size: 20px;">👨‍🍳</div>
+                </div>
+                <div class="advisor-expertise" data-en="20+ years in restaurant management. Specializes in food cost optimization and kitchen efficiency." data-zh="在餐厅管理领域拥有 20 多年经验。专门从事食品成本优化和厨房效率。" data-zh-tw="在餐厅管理领域拥有 20 多年经验。专门从事食品成本优化和厨房效率。">20+ years in restaurant management. Specializes in food cost optimization and kitchen efficiency.</div>
+            </div>
+
+            <div class="advisor-card">
+                <div class="advisor-header">
+                    <div>
+                        <div class="advisor-name">Sarah Chen</div>
+                        <div class="advisor-role" data-en="Financial & Business Strategy" data-zh="财务和业务战略" data-zh-tw="财务和业务战略">Financial & Business Strategy</div>
+                    </div>
+                    <div style="font-size: 20px;">📊</div>
+                </div>
+                <div class="advisor-expertise" data-en="MBA, CFO experience. Helps restaurants achieve financial goals and profitability." data-zh="MBA，首席财务官经验。帮助餐厅实现财务目标和盈利。" data-zh-tw="MBA，首席财务官经验。帮助餐厅实现财务目標和盈利。">MBA, CFO experience. Helps restaurants achieve financial goals and profitability.</div>
+            </div>
+
+            <div class="advisor-card">
+                <div class="advisor-header">
+                    <div>
+                        <div class="advisor-name">David Liu</div>
+                        <div class="advisor-role" data-en="Customer Experience & Marketing" data-zh="客户体验和营销" data-zh-tw="客户体验和营销">Customer Experience & Marketing</div>
+                    </div>
+                    <div style="font-size: 20px;">⭐</div>
+                </div>
+                <div class="advisor-expertise" data-en="Hospitality expert. Specializes in customer satisfaction and restaurant branding." data-zh="热情接待专家。专门从事客户满意度和餐厅品牌建设。" data-zh-tw="热情接待專家。专门从事客户满意度和餐厅品牌建设。">Hospitality expert. Specializes in customer satisfaction and restaurant branding.</div>
+            </div>
+        </div>
+
+        <!-- REQUEST CONSULTATION -->
+        <div id="request" class="content">
+            <div class="contact-form">
+                <h3 style="margin-bottom: 20px; color: #333;" data-en="Request a Consultation" data-zh="请求咨询" data-zh-tw="请求諮詢">Request a Consultation</h3>
+
+                <div class="form-group">
+                    <label data-en="Your Name" data-zh="你的名字" data-zh-tw="你的名字">Your Name</label>
+                    <input type="text" placeholder="e.g., John Smith">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Restaurant Name" data-zh="餐厅名称" data-zh-tw="餐厅名称">Restaurant Name</label>
+                    <input type="text" placeholder="e.g., Golden Dragon Restaurant">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Email Address" data-zh="电子邮件地址" data-zh-tw="电子邮件地址">Email Address</label>
+                    <input type="email" placeholder="e.g., john@restaurant.com">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Phone Number" data-zh="电话号码" data-zh-tw="电话号码">Phone Number</label>
+                    <input type="tel" placeholder="e.g., +1-555-0123">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Consultation Type" data-zh="咨询类型" data-zh-tw="諮詢類型">Consultation Type</label>
+                    <select>
+                        <option data-en="-- Select Type --" data-zh="-- 选择类型 --" data-zh-tw="-- 选择類型 --">-- Select Type --</option>
+                        <option data-en="Financial Optimization" data-zh="财务优化" data-zh-tw="财务优化">Financial Optimization</option>
+                        <option data-en="Menu Engineering" data-zh="菜单工程" data-zh-tw="菜单工程">Menu Engineering</option>
+                        <option data-en="Staff Training" data-zh="员工培训" data-zh-tw="員工培訓">Staff Training</option>
+                        <option data-en="Operations Improvement" data-zh="运营改进" data-zh-tw="运营改进">Operations Improvement</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Current Challenges" data-zh="当前挑战" data-zh-tw="当前挑战">Current Challenges</label>
+                    <textarea placeholder="Describe your current challenges..." rows="4"></textarea>
+                </div>
+
+                <button class="btn btn-primary" style="width: 100%;" onclick="alert('Consultation request submitted! We will contact you within 24 hours.')" data-en="✓ Request Consultation" data-zh="✓ 请求咨询" data-zh-tw="✓ 请求諮詢">✓ Request Consultation</button>
+            </div>
+        </div>
+
+        <!-- RESOURCES -->
+        <div id="resources" class="content">
+            <div class="section">
+                <h3 data-en="Knowledge Center" data-zh="知识中心" data-zh-tw="知識中心">📚 Knowledge Center</h3>
+
+                <h4 data-en="Popular Articles" data-zh="热门文章" data-zh-tw="热门文章">Popular Articles</h4>
+                <ul style="margin-left: 20px; color: #666; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><span data-en="5 Ways to Reduce Food Costs" data-zh="减少食品成本的5种方法" data-zh-tw="减少食品成本的5种方法">5 Ways to Reduce Food Costs</span></li>
+                    <li style="margin-bottom: 8px;"><span data-en="Implementing Effective Staff Scheduling" data-zh="实施有效的员工日程安排" data-zh-tw="实施有效的員工日程安排">Implementing Effective Staff Scheduling</span></li>
+                    <li style="margin-bottom: 8px;"><span data-en="Menu Design for Maximum Profitability" data-zh="菜单设计以获得最大利润" data-zh-tw="菜单设计以获得最大利润">Menu Design for Maximum Profitability</span></li>
+                    <li style="margin-bottom: 8px;"><span data-en="Building Customer Loyalty Programs" data-zh="建立客户忠诚度计划" data-zh-tw="建立客户忠诚度计划">Building Customer Loyalty Programs</span></li>
+                </ul>
+
+                <h4 data-en="Tools & Templates" data-zh="工具和模板" data-zh-tw="工具和模板">Tools & Templates</h4>
+                <p style="font-size: 14px; color: #666; margin-bottom: 12px;" data-en="Download our free tools including cost analysis spreadsheets, staff scheduling templates, and menu engineering worksheets." data-zh="下载我们的免费工具，包括成本分析电子表格、员工日程安排模板和菜单工程工作表。" data-zh-tw="下载我们的免费工具，包括成本分析电子表格、員工日程安排模板和菜单工程工作表。">Download our free tools including cost analysis spreadsheets, staff scheduling templates, and menu engineering worksheets.</p>
+
+                <h4 data-en="Upcoming Webinars" data-zh="即将举行的网络研讨会" data-zh-tw="即将举行的網絡研討會">Upcoming Webinars</h4>
+                <ul style="margin-left: 20px; color: #666; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><span data-en="May 25: Food Cost Control Strategies" data-zh="5月25日：食品成本控制战略" data-zh-tw="5月25日：食品成本控制战略">May 25: Food Cost Control Strategies</span></li>
+                    <li style="margin-bottom: 8px;"><span data-en="June 1: Building High-Performance Teams" data-zh="6月1日：建立高绩效团队" data-zh-tw="6月1日：建立高績效团队">June 1: Building High-Performance Teams</span></li>
+                    <li style="margin-bottom: 8px;"><span data-en="June 8: Menu Engineering Masterclass" data-zh="6月8日：菜单工程大师班" data-zh-tw="6月8日：菜单工程大师班">June 8: Menu Engineering Masterclass</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (lang === 'en') {
+                    el.textContent = el.getAttribute('data-en');
+                } else {
+                    el.textContent = el.getAttribute('data-zh');
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

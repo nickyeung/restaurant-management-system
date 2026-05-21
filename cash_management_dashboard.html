@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash Management - 现金管理 - 現金管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Calibri, "Segoe UI", Roboto, sans-serif; background: #fef9f3; }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ff6b35;
+            background: white;
+            color: #ff6b35;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #ff8c42 0%, #ff6b35 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ffe4d0;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #cc6b3e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: #ff6b35;
+            border-bottom-color: #ff6b35;
+        }
+
+        .content { display: none; }
+        .content.active { display: block; }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            text-align: center;
+        }
+
+        .metric-label { font-size: 12px; color: #999; text-transform: uppercase; margin-bottom: 8px; }
+        .metric-value { font-size: 32px; font-weight: 700; color: #ff6b35; margin-bottom: 8px; font-family: Calibri, monospace; }
+        .metric-change { font-size: 12px; color: #27ae60; }
+
+        .table-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ffe4d0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .table-section h3 { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fff5ed; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; color: #cc6b3e; border-bottom: 2px solid #ffe4d0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #ffe4d0; font-size: 14px; }
+        tr:hover { background: #fff9f4; }
+
+        .amount-cell { font-weight: 600; color: #ff6b35; font-family: Calibri, monospace; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-good { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-critical { background: #f8d7da; color: #721c24; }
+
+        @media (max-width: 600px) {
+            .metric-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
+        <button class="lang-btn" onclick="setLanguage('zh-tw')">繁體中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="💳 Cash Management" data-zh="💳 现金管理" data-zh-tw="💳 現金管理">💳 Cash Management</h1>
+            <p data-en="Monitor and control daily cash operations" data-zh="监控和控制日常现金运营" data-zh-tw="監控和控制日常現金運營">Monitor and control daily cash operations</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')" data-en="Overview" data-zh="概览" data-zh-tw="概覽">Overview</button>
+            <button class="tab" onclick="switchTab('cashlog')" data-en="Cash Log" data-zh="现金日志" data-zh-tw="現金日誌">Cash Log</button>
+            <button class="tab" onclick="switchTab('closing')" data-en="Shift Closing" data-zh="班次结束" data-zh-tw="班次結束">Shift Closing</button>
+            <button class="tab" onclick="switchTab('reports')" data-en="Daily Report" data-zh="每日报告" data-zh-tw="每日報告">Daily Report</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="content active">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Today's Sales" data-zh="今天的销售" data-zh-tw="今天的銷售">Today's Sales</div>
+                    <div class="metric-value">$8,450</div>
+                    <div class="metric-change" data-en="Up 12%" data-zh="上升 12%" data-zh-tw="上升 12%">Up 12%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Cash on Hand" data-zh="手头现金" data-zh-tw="手頭現金">Cash on Hand</div>
+                    <div class="metric-value">$2,340</div>
+                    <div class="metric-change" data-en="Total count" data-zh="总数" data-zh-tw="總數">Total count</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Active Shifts" data-zh="活跃班次" data-zh-tw="活躍班次">Active Shifts</div>
+                    <div class="metric-value">2</div>
+                    <div class="metric-change" data-en="Morning & Evening" data-zh="上午和晚上" data-zh-tw="上午和晚上">Morning & Evening</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Cash Variance" data-zh="现金差异" data-zh-tw="現金差異">Cash Variance</div>
+                    <div class="metric-value">$0</div>
+                    <div class="metric-change" data-en="Perfect match" data-zh="完全匹配" data-zh-tw="完全匹配">Perfect match</div>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <h3 data-en="Daily Cash Summary" data-zh="每日现金摘要" data-zh-tw="每日現金摘要">📊 Daily Cash Summary</h3>
+                <table>
+                    <tr>
+                        <th data-en="Time" data-zh="时间" data-zh-tw="時間">Time</th>
+                        <th data-en="Transactions" data-zh="交易" data-zh-tw="交易">Transactions</th>
+                        <th data-en="Amount" data-zh="金额" data-zh-tw="金額">Amount</th>
+                        <th data-en="Status" data-zh="状态" data-zh-tw="狀態">Status</th>
+                    </tr>
+                    <tr>
+                        <td>9:00 AM - 1:00 PM</td>
+                        <td>12</td>
+                        <td class="amount-cell">$3,450.00</td>
+                        <td><span class="status-badge status-good" data-en="Complete" data-zh="完成" data-zh-tw="完成">Complete</span></td>
+                    </tr>
+                    <tr>
+                        <td>5:00 PM - 10:00 PM</td>
+                        <td>18</td>
+                        <td class="amount-cell">$5,000.00</td>
+                        <td><span class="status-badge status-pending" data-en="In Progress" data-zh="进行中" data-zh-tw="進行中">In Progress</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- CASH LOG TAB -->
+        <div id="cashlog" class="content">
+            <div class="table-section">
+                <h3 data-en="Transaction Log" data-zh="交易日志" data-zh-tw="交易日誌">💰 Transaction Log</h3>
+                <table>
+                    <tr>
+                        <th data-en="Time" data-zh="时间" data-zh-tw="時間">Time</th>
+                        <th data-en="Type" data-zh="类型" data-zh-tw="類型">Type</th>
+                        <th data-en="Amount" data-zh="金额" data-zh-tw="金額">Amount</th>
+                        <th data-en="Payment Method" data-zh="支付方式" data-zh-tw="支付方式">Payment Method</th>
+                    </tr>
+                    <tr>
+                        <td>2:45 PM</td>
+                        <td data-en="Sale" data-zh="销售" data-zh-tw="銷售">Sale</td>
+                        <td class="amount-cell">$125.50</td>
+                        <td data-en="Card" data-zh="卡" data-zh-tw="卡">Card</td>
+                    </tr>
+                    <tr>
+                        <td>3:20 PM</td>
+                        <td data-en="Sale" data-zh="销售" data-zh-tw="銷售">Sale</td>
+                        <td class="amount-cell">$87.25</td>
+                        <td data-en="Cash" data-zh="现金" data-zh-tw="現金">Cash</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- SHIFT CLOSING TAB -->
+        <div id="closing" class="content">
+            <div class="table-section">
+                <h3 data-en="Shift Reconciliation" data-zh="班次对账" data-zh-tw="班次對帳">🔄 Shift Reconciliation</h3>
+                <table>
+                    <tr>
+                        <th data-en="Shift" data-zh="班次" data-zh-tw="班次">Shift</th>
+                        <th data-en="Sales Total" data-zh="销售总额" data-zh-tw="銷售總額">Sales Total</th>
+                        <th data-en="Cash Counted" data-zh="现金计数" data-zh-tw="現金計數">Cash Counted</th>
+                        <th data-en="Variance" data-zh="差异" data-zh-tw="差異">Variance</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Morning (9AM-1PM)" data-zh="上午(9AM-1PM)" data-zh-tw="上午(9AM-1PM)">Morning (9AM-1PM)</td>
+                        <td class="amount-cell">$3,450.00</td>
+                        <td class="amount-cell">$3,450.00</td>
+                        <td><span class="status-badge status-good">$0.00</span></td>
+                    </tr>
+                    <tr>
+                        <td data-en="Evening (5PM-10PM)" data-zh="晚上(5PM-10PM)" data-zh-tw="晚上(5PM-10PM)">Evening (5PM-10PM)</td>
+                        <td class="amount-cell">$5,000.00</td>
+                        <td class="amount-cell">$5,000.00</td>
+                        <td><span class="status-badge status-good">$0.00</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- REPORTS TAB -->
+        <div id="reports" class="content">
+            <div class="table-section">
+                <h3 data-en="Daily Financial Report" data-zh="日常财务报告" data-zh-tw="日常財務報告">📈 Daily Financial Report</h3>
+                <table>
+                    <tr>
+                        <th data-en="Metric" data-zh="指标" data-zh-tw="指標">Metric</th>
+                        <th data-en="Amount" data-zh="金额" data-zh-tw="金額">Amount</th>
+                        <th data-en="% of Total" data-zh="占总数的百分比" data-zh-tw="占總數的百分比">% of Total</th>
+                    </tr>
+                    <tr>
+                        <td data-en="Cash Sales" data-zh="现金销售" data-zh-tw="現金銷售">Cash Sales</td>
+                        <td class="amount-cell">$3,200.00</td>
+                        <td>37.8%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Card Sales" data-zh="卡销售" data-zh-tw="卡銷售">Card Sales</td>
+                        <td class="amount-cell">$4,850.00</td>
+                        <td>57.3%</td>
+                    </tr>
+                    <tr>
+                        <td data-en="Mobile Pay" data-zh="移动支付" data-zh-tw="行動支付">Mobile Pay</td>
+                        <td class="amount-cell">$400.00</td>
+                        <td>4.7%</td>
+                    </tr>
+                    <tr>
+                        <td><strong data-en="Total" data-zh="总计" data-zh-tw="總計">Total</strong></td>
+                        <td class="amount-cell"><strong>$8,450.00</strong></td>
+                        <td><strong>100%</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                let text = '';
+                if (lang === 'en') {
+                    text = el.getAttribute('data-en');
+                } else if (lang === 'zh') {
+                    text = el.getAttribute('data-zh');
+                } else if (lang === 'zh-tw') {
+                    text = el.getAttribute('data-zh-tw');
+                }
+                if (text) {
+                    el.textContent = text;
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
