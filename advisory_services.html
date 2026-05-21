@@ -179,6 +179,7 @@
     </style>
 </head>
 <body>
+    <button onclick="goBack()" style="position: fixed; top: 10px; left: 20px; padding: 10px 16px; border: 2px solid #ff6b35; background: white; color: #ff6b35; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; z-index: 999;">← Back</button>
     <div class="language-toggle">
         <button class="lang-btn active" onclick="setLanguage('en')">English</button>
         <button class="lang-btn" onclick="setLanguage('zh')">简体中文</button>
@@ -348,6 +349,9 @@
     </div>
 
     <script>
+        function goBack() {
+            window.history.back();
+        }
         let currentLanguage = 'en';
 
         function setLanguage(lang) {
